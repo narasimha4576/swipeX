@@ -2,6 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth";
 import AuthPage from "./pages/AuthPage";
 import Profile from "./pages/Profile";
+import ExperienceSection from "./pages/ExperienceSection";
+import PortfolioSection from "./pages/PortfolioSection";
 import AdminUsers from "./pages/AdminUsers";
 
 function Shell() {
@@ -26,7 +28,13 @@ function Shell() {
       </header>
 
       <main className="content">
-        {user.role === "job_seeker" && <Profile />}
+        {user.role === "job_seeker" && (
+          <>
+            <Profile />
+            <ExperienceSection />
+            <PortfolioSection />
+          </>
+        )}
         {user.role === "admin" && <AdminUsers />}
         {user.role === "recruiter" && (
           <section className="glass card">

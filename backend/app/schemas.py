@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
 
 class UserCreate(BaseModel):
@@ -57,3 +57,51 @@ class ProfileOut(BaseModel):
     experience_years: float
     skills: list[str]
     bio: str | None
+
+
+class ExperienceCreate(BaseModel):
+    company: str = Field(min_length=1, max_length=200)
+    title: str = Field(min_length=1, max_length=200)
+    start_year: int = Field(ge=1980, le=2100)
+    end_year: int | None = Field(default=None, ge=1980, le=2100)
+    description: str | None = Field(default=None, max_length=1000)
+
+    @model_validator(mode="after")
+    def check_years(self):
+        if self.end_year is not None and self.end_year < self.start_year:
+            raise ValueError("End year cannot be before start year")
+        return self
+
+
+class ExperienceOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    company: str
+    title: str
+    start_year: int
+    end_year: int | None
+    description: str | None
+
+
+class PortfolioCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=200)
+    url: str = Field(max_length=500)
+    description: str | None = Field(default=None, max_length=500)
+
+    @field_validator("url")
+    @classmethod
+    def check_url(cls, value: str) -> str:
+        value = value.strip()
+        if not value.startswith(("http://", "https://")):
+            raise ValueError("Link must start with http:// or https://")
+        return value
+
+
+class PortfolioOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
+    url: str
+    description: str | None

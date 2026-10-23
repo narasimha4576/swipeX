@@ -4,7 +4,7 @@ from sqlalchemy import text
 
 from app import models  # noqa: F401  (this loads the tables)
 from app.database import Base, engine
-from app.routers import admin, auth, profile
+from app.routers import admin, auth, profile, profile_items
 
 Base.metadata.create_all(bind=engine)
 
@@ -21,6 +21,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(admin.router)
 app.include_router(profile.router)
+app.include_router(profile_items.router)
 
 
 @app.get("/health")
