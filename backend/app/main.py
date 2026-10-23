@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.database import engine
+from app import models  # noqa: F401  (this loads the tables)
+from app.database import Base, engine
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SwipeX API")
 
