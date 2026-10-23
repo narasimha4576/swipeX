@@ -1,0 +1,113 @@
+import { useState } from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../auth";
+import { errorMessage } from "../api";
+
+export default function AuthPage() {
+  const { user, login, register } = useAuth();
+  const [mode, setMode] = useState("login");
+  const [form, setForm] = useState({
+    full_name: "",
+    email: "",
+    password: "",
+    role: "job_seeker",
+  });
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  if (user) return <Navigate to="/" replace />;
+
+  const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
+
+  async function submit(e) {
+    e.preventDefault();
+    setError("");
+    setBusy(true);
+    try {
+      if (mode === "login") await login(form.email, form.password);
+      else await register(form);
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="center">
+      <div className="auth-wrap">
+        <div className="hero">
+          <h1>
+            Swipe<span className="accent">X</span>
+          </h1>
+          <p className="muted">
+            Swipe right on your next role. AI-powered job discovery for freshers
+            and professionals.
+          </p>
+        </div>
+
+        <form className="glass card auth-card" onSubmit={submit}>
+          <div className="tabs">
+            <button
+              type="button"
+              className={mode === "login" ? "tab active" : "tab"}
+              onClick={() => setMode("login")}
+            >
+              Log in
+            </button>
+            <button
+              type="button"
+              className={mode === "register" ? "tab active" : "tab"}
+              onClick={() => setMode("register")}
+            >
+              Sign up
+            </button>
+          </div>
+
+          {mode === "register" && (
+            <label className="field">
+              <span>Full name</span>
+              <input value={form.full_name} onChange={set("full_name")} required />
+            </label>
+          )}
+
+          <label className="field">
+            <span>Email</span>
+            <input type="email" value={form.email} onChange={set("email")} required />
+          </label>
+
+          <label className="field">
+            <span>Password</span>
+            <input
+              type="password"
+              value={form.password}
+              onChange={set("password")}
+              minLength={mode === "register" ? 8 : undefined}
+              required
+            />
+          </label>
+
+          {mode === "register" && (
+            <label className="field">
+              <span>I am a</span>
+              <select value={form.role} onChange={set("role")}>
+                <option value="job_seeker">Job seeker</option>
+                <option value="recruiter">Recruiter</option>
+              </select>
+            </label>
+          )}
+
+          {error && <div className="msg error">{error}</div>}
+
+          <button className="btn primary" disabled={busy}>
+            {busy
+              ? "Please wait..."
+              : mode === "login"
+              ? "Log in"
+              : "Create account"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
