@@ -127,3 +127,18 @@ th { color: var(--muted); font-weight: 600; }
 .item p { margin: 0.3rem 0 0; font-size: 0.9rem; }
 .item a { color: var(--teal); word-break: break-all; font-size: 0.9rem; }
 .btn.danger { color: var(--coral); border-color: #ff6b6b66; align-self: flex-start; }
+
+.nav { display: flex; gap: 0.5rem; margin-bottom: 1.2rem; }
+.nav-link { padding: 0.5rem 1rem; border-radius: 999px; color: var(--muted); text-decoration: none; font-weight: 600; border: 1px solid transparent; }
+.nav-link.active { color: var(--text); background: rgba(255, 255, 255, 0.08); border-color: var(--glass-border); }
+.jobs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; }
+.job-card { padding: 1.2rem; display: flex; flex-direction: column; gap: 0.7rem; }
+.job-card h3 { margin: 0; font-size: 1.1rem; }
+.meta { display: flex; flex-wrap: wrap; gap: 0.4rem 0.9rem; font-size: 0.85rem; color: var(--muted); }
+.salary { font-family: ui-monospace, Consolas, monospace; color: var(--gold); font-weight: 600; }
+.foot { margin-top: auto; }
+.job-card details summary { cursor: pointer; color: var(--teal); font-size: 0.85rem; }
+.pager { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.2rem; }
+.badge.mnc { background: #2dd4bf26; color: var(--teal); }
+.badge.startup { background: #f5c45126; color: var(--gold); }
+.badge.new_startup { background: #ff6b6b26; color: var(--coral); }

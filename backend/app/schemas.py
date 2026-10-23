@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
@@ -105,3 +106,37 @@ class PortfolioOut(BaseModel):
     title: str
     url: str
     description: str | None
+
+
+class CompanyOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    company_type: str
+    location: str | None
+    website: str | None
+    founded_year: int | None
+
+
+class JobOut(BaseModel):
+    id: int
+    title: str
+    description: str
+    location: str | None
+    is_remote: bool
+    job_type: str
+    experience_level: str
+    salary_min_lpa: float | None
+    salary_max_lpa: float | None
+    skills: list[str]
+    applicant_count: int
+    created_at: datetime
+    company: CompanyOut
+
+
+class JobPage(BaseModel):
+    items: list[JobOut]
+    total: int
+    page: int
+    page_size: int
