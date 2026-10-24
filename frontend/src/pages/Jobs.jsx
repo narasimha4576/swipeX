@@ -6,6 +6,20 @@ const JOB_TYPE_LABEL = { full_time: "Full-time", internship: "Internship" };
 const LEVEL_LABEL = { fresher: "Fresher", junior: "Junior", mid: "Mid-level", senior: "Senior" };
 const PAGE_SIZE = 9;
 
+const GRADIENTS = [
+  "linear-gradient(135deg, #0a84ff, #5e5ce6)",
+  "linear-gradient(135deg, #ff375f, #ff9f0a)",
+  "linear-gradient(135deg, #30d158, #0a84ff)",
+  "linear-gradient(135deg, #bf5af2, #ff375f)",
+  "linear-gradient(135deg, #ff9f0a, #ffd60a)",
+];
+
+function logoColor(name) {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 997;
+  return GRADIENTS[h % GRADIENTS.length];
+}
+
 function timeAgo(iso) {
   const then = new Date(iso.endsWith("Z") ? iso : iso + "Z");
   const hours = Math.floor((Date.now() - then.getTime()) / 3600000);
@@ -52,8 +66,11 @@ export default function Jobs() {
       <div className="jobs-grid">
         {data.items.map((job) => (
           <article className="glass job-card" key={job.id}>
-            <div className="row between">
-              <div>
+            <div className="job-top">
+              <div className="logo" style={{ background: logoColor(job.company.name) }}>
+                {job.company.name.charAt(0)}
+              </div>
+              <div className="job-title">
                 <h3>{job.title}</h3>
                 <div className="muted">{job.company.name}</div>
               </div>
