@@ -236,3 +236,27 @@ th { color: var(--muted); font-weight: 600; }
 .comp.low { color: #6ee08a; }
 .comp.medium { color: #ffb84d; }
 .comp.high { color: #ff8a82; }
+
+a.btn { text-decoration: none; display: inline-block; }
+.center-text { text-align: center; }
+.stats { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.stat { padding: 0.25rem 0.75rem; border-radius: 999px; background: rgba(255, 255, 255, 0.1); font-size: 0.8rem; font-weight: 600; }
+.swipe-stack { position: relative; height: min(540px, 64vh); margin: 1rem 0; }
+.swipe-card { position: absolute; inset: 0; padding: 1.3rem; display: flex; flex-direction: column; gap: 0.8rem; overflow: hidden; user-select: none; cursor: grab; touch-action: pan-y; }
+.swipe-card:active { cursor: grabbing; }
+.swipe-card h3 { font-size: 1.5rem; }
+.swipe-card .logo { width: 56px; height: 56px; font-size: 1.5rem; border-radius: 16px; }
+.clamp { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin: 0; }
+.stamp { position: absolute; top: 22px; padding: 0.3rem 0.8rem; border: 3px solid; border-radius: 12px; font-weight: 800; letter-spacing: 0.08em; font-size: 1.3rem; pointer-events: none; z-index: 5; }
+.stamp.save { left: 20px; color: #6ee08a; border-color: #6ee08a; transform: rotate(-12deg); }
+.stamp.skip { right: 20px; color: #ff8a82; border-color: #ff8a82; transform: rotate(12deg); }
+.empty-state { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; z-index: 0; }
+.swipe-actions { display: flex; justify-content: center; align-items: center; gap: 1.4rem; }
+.round-btn { width: 66px; height: 66px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--stroke); background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: var(--text); cursor: pointer; transition: transform 0.12s, background 0.2s; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+.round-btn:hover { background: rgba(255, 255, 255, 0.2); }
+.round-btn:active { transform: scale(0.9); }
+.round-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.round-btn.skip { color: #ff8a82; }
+.round-btn.save { color: #6ee08a; }
+.round-btn.undo { width: 48px; height: 48px; }
+.round-btn.undo svg { width: 22px; height: 22px; }

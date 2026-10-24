@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth";
 import AuthPage from "./pages/AuthPage";
+import Discover from "./pages/Discover";
 import Jobs from "./pages/Jobs";
 import Profile from "./pages/Profile";
 import ExperienceSection from "./pages/ExperienceSection";
@@ -23,6 +24,12 @@ function Icon({ children }) {
 }
 
 const ICONS = {
+  discover: (
+    <Icon>
+      <rect x="4" y="3" width="16" height="18" rx="4" />
+      <path d="M12 16.5s-3.5-2-3.5-4.5a2 2 0 0 1 3.5-1.3 2 2 0 0 1 3.5 1.3c0 2.5-3.5 4.5-3.5 4.5z" />
+    </Icon>
+  ),
   jobs: (
     <Icon>
       <rect x="3" y="7" width="18" height="13" rx="3" />
@@ -77,6 +84,7 @@ function Workspace() {
 
 const TABS = {
   job_seeker: [
+    ["/discover", "Discover", "discover"],
     ["/jobs", "Jobs", "jobs"],
     ["/profile", "Profile", "profile"],
   ],
@@ -118,6 +126,7 @@ function Shell() {
       <main className="content">
         <Routes>
           <Route path="/jobs" element={<Jobs />} />
+          {user.role === "job_seeker" && <Route path="/discover" element={<Discover />} />}
           {user.role === "job_seeker" && <Route path="/profile" element={<ProfilePage />} />}
           {user.role === "recruiter" && <Route path="/workspace" element={<Workspace />} />}
           {user.role === "admin" && <Route path="/admin" element={<AdminUsers />} />}

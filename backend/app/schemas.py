@@ -141,3 +141,20 @@ class JobPage(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class SwipeCreate(BaseModel):
+    job_id: int
+    direction: Literal["left", "right"]
+
+
+class SwipeOut(BaseModel):
+    job_id: int
+    direction: str
+
+
+class DeckOut(BaseModel):
+    items: list[JobOut]
+    remaining: int
+    saved: int
+    skipped: int
