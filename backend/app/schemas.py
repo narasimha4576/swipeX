@@ -131,6 +131,7 @@ class JobOut(BaseModel):
     salary_max_lpa: float | None
     skills: list[str]
     applicant_count: int
+    competition_level: str
     created_at: datetime
     company: CompanyOut
 

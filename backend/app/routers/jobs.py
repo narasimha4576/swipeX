@@ -1,5 +1,8 @@
+from datetime import datetime, timedelta, timezone
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, select
+from sqlalchemy import Text, cast, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.deps import get_current_user, get_db
@@ -7,6 +10,17 @@ from app.models import Company, Job, User
 from app.schemas import CompanyOut, JobOut, JobPage
 
 router = APIRouter(tags=["jobs"])
+
+LOW_COMPETITION_MAX = 60
+HIGH_COMPETITION_MIN = 200
+
+
+def competition_level(applicants: int) -> str:
+    if applicants < LOW_COMPETITION_MAX:
+        return "low"
+    if applicants >= HIGH_COMPETITION_MIN:
+        return "high"
+    return "medium"
 
 
 def job_to_out(job: Job, company: Company) -> JobOut:
@@ -22,6 +36,7 @@ def job_to_out(job: Job, company: Company) -> JobOut:
         salary_max_lpa=job.salary_max_lpa,
         skills=job.skills or [],
         applicant_count=job.applicant_count,
+        competition_level=competition_level(job.applicant_count),
         created_at=job.created_at,
         company=CompanyOut.model_validate(company),
     )
@@ -29,19 +44,79 @@ def job_to_out(job: Job, company: Company) -> JobOut:
 
 @router.get("/jobs", response_model=JobPage)
 def list_jobs(
+    q: str | None = None,
+    company_type: str | None = None,
+    job_type: str | None = None,
+    experience_level: str | None = None,
+    remote: bool | None = None,
+    location: str | None = None,
+    skill: str | None = None,
+    min_salary: float | None = Query(None, ge=0),
+    max_age_days: int | None = Query(None, ge=1, le=365),
+    fresher_friendly: bool = False,
+    low_competition: bool = False,
+    sort: Literal["newest", "salary", "competition"] = "newest",
     page: int = Query(1, ge=1),
     page_size: int = Query(9, ge=1, le=50),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    conditions = [Job.is_active.is_(True)]
+
+    if q and q.strip():
+        pattern = f"%{q.strip()}%"
+        conditions.append(
+            or_(
+                Job.title.ilike(pattern),
+                Company.name.ilike(pattern),
+                cast(Job.skills, Text).ilike(pattern),
+            )
+        )
+    if company_type:
+        conditions.append(Company.company_type == company_type)
+    if job_type:
+        conditions.append(Job.job_type == job_type)
+    if experience_level:
+        conditions.append(Job.experience_level == experience_level)
+    if remote is not None:
+        conditions.append(Job.is_remote.is_(remote))
+    if location and location.strip():
+        conditions.append(Job.location.ilike(f"%{location.strip()}%"))
+    if skill and skill.strip():
+        clean = skill.strip().replace('"', "")
+        conditions.append(cast(Job.skills, Text).ilike(f'%"{clean}"%'))
+    if min_salary is not None:
+        conditions.append(Job.salary_max_lpa >= min_salary)
+    if max_age_days is not None:
+        since = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(
+            days=max_age_days
+        )
+        conditions.append(Job.created_at >= since)
+    if fresher_friendly:
+        conditions.append(
+            or_(Job.experience_level == "fresher", Job.job_type == "internship")
+        )
+    if low_competition:
+        conditions.append(Job.applicant_count < LOW_COMPETITION_MAX)
+
+    if sort == "salary":
+        order = [Job.salary_max_lpa.desc().nulls_last(), Job.id.desc()]
+    elif sort == "competition":
+        order = [Job.applicant_count.asc(), Job.id.desc()]
+    else:
+        order = [Job.created_at.desc(), Job.id.desc()]
+
     total = db.scalar(
-        select(func.count()).select_from(Job).where(Job.is_active.is_(True))
+        select(func.count())
+        .select_from(Job)
+        .join(Company, Job.company_id == Company.id)
+        .where(*conditions)
     )
     stmt = (
         select(Job, Company)
         .join(Company, Job.company_id == Company.id)
-        .where(Job.is_active.is_(True))
-        .order_by(Job.created_at.desc(), Job.id.desc())
+        .where(*conditions)
+        .order_by(*order)
         .offset((page - 1) * page_size)
         .limit(page_size)
     )
