@@ -131,3 +131,11 @@ class PortfolioItem(Base):
     title: Mapped[str] = mapped_column(String(200))
     url: Mapped[str] = mapped_column(String(500))
     description: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
+
+class RecruiterProfile(Base):
+    __tablename__ = "recruiter_profiles"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
+    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"))

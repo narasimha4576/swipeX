@@ -158,3 +158,65 @@ class DeckOut(BaseModel):
     remaining: int
     saved: int
     skipped: int
+
+
+class CompanyUpdate(BaseModel):
+    name: str = Field(min_length=2, max_length=200)
+    company_type: Literal["mnc", "startup", "new_startup"]
+    location: str | None = Field(default=None, max_length=120)
+    website: str | None = Field(default=None, max_length=255)
+    founded_year: int | None = Field(default=None, ge=1800, le=2100)
+
+    @field_validator("website")
+    @classmethod
+    def check_website(cls, value):
+        if value is None:
+            return value
+        value = value.strip()
+        if value and not value.startswith(("http://", "https://")):
+            raise ValueError("Website must start with http:// or https://")
+        return value or None
+
+
+class JobCreate(BaseModel):
+    title: str = Field(min_length=3, max_length=200)
+    description: str = Field(min_length=20, max_length=5000)
+    location: str | None = Field(default=None, max_length=120)
+    is_remote: bool = False
+    job_type: Literal["full_time", "internship"] = "full_time"
+    experience_level: Literal["fresher", "junior", "mid", "senior"] = "fresher"
+    salary_min_lpa: float | None = Field(default=None, ge=0, le=500)
+    salary_max_lpa: float | None = Field(default=None, ge=0, le=500)
+    skills: list[str] = Field(default_factory=list, max_length=20)
+
+    @field_validator("skills")
+    @classmethod
+    def clean_job_skills(cls, value: list[str]) -> list[str]:
+        seen = set()
+        cleaned = []
+        for skill in value:
+            skill = skill.strip()
+            if not skill:
+                continue
+            if len(skill) > 50:
+                raise ValueError("Each skill must be 50 characters or less")
+            if skill.lower() not in seen:
+                seen.add(skill.lower())
+                cleaned.append(skill)
+        return cleaned
+
+    @model_validator(mode="after")
+    def check_job(self):
+        has_min = self.salary_min_lpa is not None
+        has_max = self.salary_max_lpa is not None
+        if has_min != has_max:
+            raise ValueError("Give both minimum and maximum salary, or leave both empty")
+        if has_min and self.salary_min_lpa > self.salary_max_lpa:
+            raise ValueError("Minimum salary cannot be higher than maximum salary")
+        if not self.is_remote and not (self.location and self.location.strip()):
+            raise ValueError("Add a location or mark the job as remote")
+        return self
+
+
+class MyJobOut(JobOut):
+    is_active: bool

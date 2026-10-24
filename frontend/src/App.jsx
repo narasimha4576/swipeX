@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import ExperienceSection from "./pages/ExperienceSection";
 import PortfolioSection from "./pages/PortfolioSection";
 import AdminUsers from "./pages/AdminUsers";
+import Workspace from "./pages/Workspace";
 
 function Icon({ children }) {
   return (
@@ -71,16 +72,6 @@ function ProfilePage() {
   );
 }
 
-function Workspace() {
-  return (
-    <section className="glass card">
-      <h2>Recruiter workspace</h2>
-      <p className="muted">
-        Posting jobs and reviewing applicants arrive in the coming days.
-      </p>
-    </section>
-  );
-}
 
 const TABS = {
   job_seeker: [
@@ -88,9 +79,7 @@ const TABS = {
     ["/jobs", "Jobs", "jobs"],
     ["/profile", "Profile", "profile"],
   ],
-  recruiter: [
-    ["/jobs", "Jobs", "jobs"],
-    ["/workspace", "Workspace", "workspace"],
+  recruiter: [["/workspace", "Workspace", "workspace"], ["/jobs", "Jobs", "jobs"],
   ],
   admin: [
     ["/admin", "Users", "users"],
