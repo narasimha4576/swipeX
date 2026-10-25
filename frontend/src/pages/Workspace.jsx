@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api, { errorMessage } from "../api";
+import MyPostingsList from "./MyPostings";
 import {
   COMP_LABEL,
   JOB_TYPE_LABEL,
@@ -354,38 +355,6 @@ function PostJobSection({ company, onPosted }) {
   );
 }
 
-function MyPostings({ jobs, onToggle }) {
-  return (
-    <section className="glass card">
-      <h2>My postings</h2>
-      <p className="muted">{jobs.length === 0 ? "No jobs posted yet." : `${jobs.length} posted`}</p>
-      {jobs.map((job) => (
-        <div className="item" key={job.id}>
-          <div>
-            <h3>{job.title}</h3>
-            <div className="muted small">
-              {job.is_remote ? "Remote" : job.location} | {JOB_TYPE_LABEL[job.job_type] ?? job.job_type} |{" "}
-              {LEVEL_LABEL[job.experience_level] ?? job.experience_level}
-            </div>
-            <div className="muted small">
-              {salary(job)} | Posted {timeAgo(job.created_at)}
-            </div>
-            <div className="row" style={{ marginTop: "0.4rem", flexWrap: "wrap" }}>
-              <span className={job.is_active ? "badge open" : "badge closed"}>
-                {job.is_active ? "Open" : "Closed"}
-              </span>
-              <span className="muted small">{job.applicant_count} applicants</span>
-              <span className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</span>
-            </div>
-          </div>
-          <button className="btn small" onClick={() => onToggle(job)}>
-            {job.is_active ? "Close" : "Reopen"}
-          </button>
-        </div>
-      ))}
-    </section>
-  );
-}
 
 export default function Workspace() {
   const [company, setCompany] = useState(undefined);
@@ -441,7 +410,7 @@ export default function Workspace() {
       </section>
       <CompanySection company={company} onSaved={setCompany} />
       <PostJobSection company={company} onPosted={loadJobs} />
-      <MyPostings jobs={jobs} onToggle={toggle} />
+      <MyPostingsList jobs={jobs} onToggle={toggle} />
     </>
   );
 }

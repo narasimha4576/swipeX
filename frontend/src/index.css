@@ -277,3 +277,11 @@ input[type="file"] { padding: 0.6rem 0.8rem; }
 .btn.primary-inline { background: linear-gradient(180deg, #2a97ff, #0a84ff); border: none; color: #fff; }
 .apply-panel { padding: 0.9rem; border-radius: 16px; background: rgba(255, 255, 255, 0.07); border: 1px solid var(--stroke); }
 .apply-panel .field { margin-bottom: 0.8rem; }
+
+.posting { border-top: 1px solid var(--stroke); }
+.posting .item { border-top: none; }
+.applicants { margin: 0 0 1rem; padding: 0.9rem; border-radius: 18px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--stroke); }
+.applicant { padding: 0.9rem 0; border-top: 1px solid var(--stroke); display: flex; flex-direction: column; gap: 0.6rem; }
+.applicant h3 { margin: 0; font-size: 1rem; }
+.applicant-details { padding: 0.8rem; border-radius: 14px; background: rgba(255, 255, 255, 0.06); font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.btn.small.on { background: var(--blue); border-color: var(--blue); color: #fff; }

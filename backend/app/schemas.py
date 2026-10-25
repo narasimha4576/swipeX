@@ -243,3 +243,23 @@ class ApplicationOut(BaseModel):
     updated_at: datetime
     resume_name: str | None
     job: JobOut
+
+
+class StatusUpdate(BaseModel):
+    status: Literal["applied", "shortlisted", "interview", "rejected"]
+
+
+class ApplicantOut(BaseModel):
+    application_id: int
+    status: str
+    updated_at: datetime
+    full_name: str
+    email: str
+    headline: str | None
+    location: str | None
+    experience_years: float
+    skills: list[str]
+    bio: str | None
+    resume_name: str | None
+    experiences: list[ExperienceOut]
+    portfolio: list[PortfolioOut]
