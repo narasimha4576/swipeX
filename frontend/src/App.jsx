@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import ExperienceSection from "./pages/ExperienceSection";
 import PortfolioSection from "./pages/PortfolioSection";
 import AdminUsers from "./pages/AdminUsers";
+import AdminCompanies from "./pages/AdminCompanies";
 import Applications from "./pages/Applications";
 import ResumeSection from "./pages/ResumeSection";
 import Workspace from "./pages/Workspace";
@@ -60,6 +61,14 @@ const ICONS = {
       <path d="M9 9h6M9 13h6M9 17h3" />
     </Icon>
   ),
+  companies: (
+    <Icon>
+      <path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" />
+      <path d="M16 9h2a2 2 0 0 1 2 2v10" />
+      <path d="M2 21h20" />
+      <path d="M8 7h4M8 11h4M8 15h4" />
+    </Icon>
+  ),
   users: (
     <Icon>
       <circle cx="9" cy="8" r="3.5" />
@@ -92,7 +101,8 @@ const TABS = {
   recruiter: [["/workspace", "Workspace", "workspace"], ["/jobs", "Jobs", "jobs"],
   ],
   admin: [
-    ["/admin", "Users", "users"],
+    ["/admin/users", "Users", "users"],
+    ["/admin/companies", "Companies", "companies"],
     ["/jobs", "Jobs", "jobs"],
   ],
 };
@@ -129,7 +139,8 @@ function Shell() {
           {user.role === "job_seeker" && <Route path="/applications" element={<Applications />} />}
           {user.role === "job_seeker" && <Route path="/profile" element={<ProfilePage />} />}
           {user.role === "recruiter" && <Route path="/workspace" element={<Workspace />} />}
-          {user.role === "admin" && <Route path="/admin" element={<AdminUsers />} />}
+          {user.role === "admin" && <Route path="/admin/users" element={<AdminUsers />} />}
+          {user.role === "admin" && <Route path="/admin/companies" element={<AdminCompanies />} />}
           <Route path="*" element={<Navigate to={home} replace />} />
         </Routes>
       </main>

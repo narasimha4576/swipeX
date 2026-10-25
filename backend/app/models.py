@@ -50,10 +50,20 @@ class Company(Base):
     location: Mapped[str | None] = mapped_column(String(120), nullable=True)
     website: Mapped[str | None] = mapped_column(String(255), nullable=True)
     founded_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    verification_status: Mapped[str] = mapped_column(
+        String(20), default="unverified", server_default="unverified"
+    )
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    verification_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source: Mapped[str] = mapped_column(String(30), default="native", server_default="native")
+    source_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
 
 class Job(Base):
     __tablename__ = "jobs"
+    __table_args__ = (
+        UniqueConstraint("source", "external_id", name="one_job_per_source_id"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"))
@@ -68,6 +78,10 @@ class Job(Base):
     salary_max_lpa: Mapped[float | None] = mapped_column(Float, nullable=True)
     skills: Mapped[list] = mapped_column(JSON, default=list)
     applicant_count: Mapped[int] = mapped_column(Integer, default=0)
+    source: Mapped[str] = mapped_column(String(30), default="native", server_default="native")
+    external_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    apply_url: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 

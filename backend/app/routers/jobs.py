@@ -61,7 +61,7 @@ def list_jobs(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    conditions = [Job.is_active.is_(True)]
+    conditions = [Job.is_active.is_(True), Company.verification_status == "verified"]
 
     if q and q.strip():
         pattern = f"%{q.strip()}%"
@@ -138,7 +138,7 @@ def get_job(
     stmt = (
         select(Job, Company)
         .join(Company, Job.company_id == Company.id)
-        .where(Job.id == job_id, Job.is_active.is_(True))
+        .where(Job.id == job_id, Job.is_active.is_(True), Company.verification_status == "verified")
     )
     row = db.execute(stmt).first()
     if row is None:
@@ -152,7 +152,7 @@ def list_companies(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    stmt = select(Company).order_by(Company.name)
+    stmt = select(Company).where(Company.verification_status == "verified").order_by(Company.name)
     if company_type:
         stmt = stmt.where(Company.company_type == company_type)
     return db.scalars(stmt).all()

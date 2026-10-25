@@ -2,8 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app import models  # noqa: F401  (this loads the tables)
-from app.database import Base, engine
+from app.database import engine
 from app.routers import (
     admin,
     applications,
@@ -14,9 +13,8 @@ from app.routers import (
     recruiter,
     resumes,
     swipes,
+    verification,
 )
-
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SwipeX API")
 
@@ -30,6 +28,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(admin.router)
+app.include_router(verification.admin_router)
 app.include_router(profile.router)
 app.include_router(profile_items.router)
 app.include_router(resumes.router)
@@ -37,6 +36,7 @@ app.include_router(jobs.router)
 app.include_router(swipes.router)
 app.include_router(applications.router)
 app.include_router(recruiter.router)
+app.include_router(verification.recruiter_router)
 
 
 @app.get("/health")

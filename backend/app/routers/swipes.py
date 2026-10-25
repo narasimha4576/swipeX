@@ -17,7 +17,11 @@ def get_deck(
     user: User = Depends(require_roles("job_seeker")),
 ):
     already_swiped = select(Swipe.job_id).where(Swipe.user_id == user.id)
-    conditions = [Job.is_active.is_(True), Job.id.not_in(already_swiped)]
+    conditions = [
+        Job.is_active.is_(True),
+        Company.verification_status == "verified",
+        Job.id.not_in(already_swiped),
+    ]
 
     rows = db.execute(
         select(Job, Company)
@@ -27,7 +31,12 @@ def get_deck(
         .limit(limit)
     ).all()
 
-    remaining = db.scalar(select(func.count()).select_from(Job).where(*conditions))
+    remaining = db.scalar(
+        select(func.count())
+        .select_from(Job)
+        .join(Company, Job.company_id == Company.id)
+        .where(*conditions)
+    )
     saved = db.scalar(
         select(func.count())
         .select_from(Swipe)

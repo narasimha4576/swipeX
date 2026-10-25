@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api, { errorMessage } from "../api";
 import MyPostingsList from "./MyPostings";
+import VerificationCard from "./VerificationCard";
 import {
   COMP_LABEL,
   JOB_TYPE_LABEL,
@@ -409,6 +410,7 @@ export default function Workspace() {
         {error && <div className="msg error">{error}</div>}
       </section>
       <CompanySection company={company} onSaved={setCompany} />
+      {company && <VerificationCard key={company.name + (company.website ?? "")} company={company} />}
       <PostJobSection company={company} onPosted={loadJobs} />
       <MyPostingsList jobs={jobs} onToggle={toggle} />
     </>

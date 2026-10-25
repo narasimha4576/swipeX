@@ -79,6 +79,11 @@ def save_company(
         db.flush()
         db.add(RecruiterProfile(user_id=user.id, company_id=company.id))
     else:
+        if company.verification_status == "verified" and (
+            company.name != name or company.website != data.website
+        ):
+            company.verification_status = "pending"
+            company.verified_at = None
         company.name = name
         company.company_type = data.company_type
         company.location = location

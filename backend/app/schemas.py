@@ -109,6 +109,7 @@ class PortfolioOut(BaseModel):
 
 
 class CompanyOut(BaseModel):
+    verification_status: str = "unverified"
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -263,3 +264,25 @@ class ApplicantOut(BaseModel):
     resume_name: str | None
     experiences: list[ExperienceOut]
     portfolio: list[PortfolioOut]
+
+
+class VerificationRequest(BaseModel):
+    note: str = Field(min_length=10, max_length=1000)
+
+
+class VerificationStatusOut(BaseModel):
+    status: str
+    note: str | None = None
+
+
+class DecisionIn(BaseModel):
+    decision: Literal["verified", "rejected", "unverified"]
+    note: str | None = Field(default=None, max_length=1000)
+
+
+class AdminCompanyOut(CompanyOut):
+    verification_note: str | None = None
+    verified_at: datetime | None = None
+    source: str = "native"
+    owner_email: str | None = None
+    jobs_count: int = 0
