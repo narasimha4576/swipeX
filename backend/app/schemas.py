@@ -220,3 +220,26 @@ class JobCreate(BaseModel):
 
 class MyJobOut(JobOut):
     is_active: bool
+
+
+class ResumeOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    version_name: str
+    is_default: bool
+    created_at: datetime
+
+
+class ApplyIn(BaseModel):
+    job_id: int
+    resume_id: int
+
+
+class ApplicationOut(BaseModel):
+    id: int
+    status: str
+    created_at: datetime
+    updated_at: datetime
+    resume_name: str | None
+    job: JobOut

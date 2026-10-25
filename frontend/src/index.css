@@ -266,3 +266,14 @@ a.btn { text-decoration: none; display: inline-block; }
 .badge.open { background: rgba(48, 209, 88, 0.2); color: #6ee08a; }
 .badge.closed { background: rgba(255, 255, 255, 0.12); color: var(--muted); }
 a.link { color: #64b5ff; text-decoration: none; word-break: break-all; }
+
+.badge.saved { background: rgba(10, 132, 255, 0.22); color: #7ebcff; }
+.badge.applied { background: rgba(191, 90, 242, 0.22); color: #d9a3ff; }
+.badge.shortlisted { background: rgba(48, 209, 88, 0.2); color: #6ee08a; }
+.badge.interview { background: rgba(255, 159, 10, 0.2); color: #ffb84d; }
+.badge.rejected { background: rgba(255, 69, 58, 0.2); color: #ff8a82; }
+input[type="file"] { padding: 0.6rem 0.8rem; }
+.actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: flex-start; }
+.btn.primary-inline { background: linear-gradient(180deg, #2a97ff, #0a84ff); border: none; color: #fff; }
+.apply-panel { padding: 0.9rem; border-radius: 16px; background: rgba(255, 255, 255, 0.07); border: 1px solid var(--stroke); }
+.apply-panel .field { margin-bottom: 0.8rem; }
