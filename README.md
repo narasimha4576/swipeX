@@ -66,7 +66,7 @@ The app has an iPhone-style glassmorphism design: a colourful gradient wallpaper
 - [x] Create and edit a company profile (MNC, startup or newly founded startup)
 - [x] Post jobs (type, level, salary range, skills, remote option)
 - [x] Close and reopen postings
-- [ ] Review applicants and move them to shortlisted, interview or rejected (in progress)
+- [x] Review applicants (profile, skills, experience, portfolio, resume PDF) and move them to shortlisted, interview or rejected
 
 ### Admins
 - [x] See all users
@@ -139,7 +139,9 @@ sequenceDiagram
     S->>App: Swipe right (save)
     S->>App: Apply with a chosen resume
     App-->>App: Applicant count goes up
-    App-->>R: Applicant review (in progress)
+    App-->>R: Applicants with profile and resume
+    R->>App: Shortlist, interview or reject
+    App-->>S: New status shows in Applications
 ```
 
 ### Swiping
@@ -283,6 +285,7 @@ One swipe and one application are allowed per user and job, so nobody can swipe 
 | Swipe, save and apply | Yes | No | No |
 | Manage profile, experience, portfolio and resumes | Yes | No | No |
 | Create a company and post or close jobs | No | Yes | No |
+| Review applicants and update their status | No | Yes | No |
 | List users and enable or disable accounts | No | No | Yes |
 
 Only job seekers and recruiters can sign up on their own. The first admin is created with a script.
@@ -305,7 +308,7 @@ Interactive API docs are available at `http://127.0.0.1:8000/docs` while the bac
 | Jobs | `GET /jobs` (search, filters, sort, pages), `GET /jobs/{id}`, `GET /companies` |
 | Swipes | `GET /swipes/deck`, `POST /swipes`, `DELETE /swipes/{job_id}` (undo) |
 | Applications | `GET /applications`, `POST /applications/apply`, `DELETE /applications/{id}` (saved only) |
-| Recruiter | `GET /recruiter/company`, `PUT /recruiter/company`, `GET /recruiter/jobs`, `POST /recruiter/jobs`, `PATCH /recruiter/jobs/{id}/active` |
+| Recruiter | `GET /recruiter/company`, `PUT /recruiter/company`, `GET /recruiter/jobs`, `POST /recruiter/jobs`, `PATCH /recruiter/jobs/{id}/active`, `GET /recruiter/jobs/{id}/applicants`, `PATCH /recruiter/applications/{id}/status`, `GET /recruiter/applications/{id}/resume` |
 
 `GET /jobs` filters: `q`, `company_type`, `job_type`, `experience_level`, `remote`, `location`, `skill`, `min_salary`, `max_age_days`, `fresher_friendly`, `low_competition`, `sort`, `page`, `page_size`.
 
@@ -361,6 +364,8 @@ swipeX/
 |           |-- Profile.jsx, ResumeSection.jsx,
 |           |   ExperienceSection.jsx, PortfolioSection.jsx
 |           |-- Workspace.jsx         Recruiter workspace
+|           |-- MyPostings.jsx        Recruiter job list
+|           |-- ApplicantsPanel.jsx   Review applicants
 |           `-- AdminUsers.jsx        Admin users table
 |-- docs/
 |   `-- schema.md
@@ -477,12 +482,13 @@ The database listens on port **5433** on your machine, so it does not clash with
 - [x] Apply with a resume and application tracking
 - [x] Recruiter company profile and job posting
 - [x] iPhone-style glassmorphism interface
+- [x] Recruiters review applicants (shortlist, interview, reject)
 
 **In progress**
-- [ ] Recruiters review applicants (shortlist, interview, reject)
+- [ ] Resume parsing and ATS scoring
 
 **Next**
-- [ ] Resume parsing and ATS scoring
+- [ ] Application timeline and small clean-ups (apply and save buttons on the Jobs list, company pages)
 - [ ] Missing skills and keywords, with AI improvement suggestions
 - [ ] Personalised recommendations and match percentages
 - [ ] Notifications (new jobs, status changes)
