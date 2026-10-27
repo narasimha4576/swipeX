@@ -56,6 +56,9 @@ def apply(
     if job is None or not job.is_active:
         raise HTTPException(status_code=404, detail="This job is not open any more")
 
+    if job.source != "native":
+        raise HTTPException(status_code=400, detail="Apply for this job on the company site")
+
     resume = db.get(Resume, data.resume_id)
     if resume is None or resume.user_id != user.id:
         raise HTTPException(status_code=400, detail="Choose one of your own resumes")
@@ -119,3 +122,25 @@ def remove_saved(
     db.delete(application)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/{application_id}/mark-applied", response_model=ApplicationOut)
+def mark_applied_on_company_site(
+    application_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(seeker_only),
+):
+    application = db.get(Application, application_id)
+    if application is None or application.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Application not found")
+    job = db.get(Job, application.job_id)
+    if job is None or job.source == "native":
+        raise HTTPException(status_code=400, detail="Apply to this job with a resume")
+    if application.status != "saved":
+        raise HTTPException(status_code=400, detail="This job is already marked as applied")
+
+    application.status = "applied"
+    db.commit()
+    db.refresh(application)
+    company = db.get(Company, job.company_id)
+    return to_out(application, job, company, None)

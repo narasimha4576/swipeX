@@ -1,8 +1,11 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.database import engine
+from app.importers.scheduler import start_scheduler, stop_scheduler
 from app.routers import (
     admin,
     applications,
@@ -16,7 +19,15 @@ from app.routers import (
     verification,
 )
 
-app = FastAPI(title="SwipeX API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
+
+
+app = FastAPI(title="SwipeX API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

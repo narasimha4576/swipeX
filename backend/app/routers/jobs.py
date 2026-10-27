@@ -36,7 +36,13 @@ def job_to_out(job: Job, company: Company) -> JobOut:
         salary_max_lpa=job.salary_max_lpa,
         skills=job.skills or [],
         applicant_count=job.applicant_count,
-        competition_level=competition_level(job.applicant_count),
+        competition_level=(
+            competition_level(job.applicant_count)
+            if job.source == "native"
+            else "unknown"
+        ),
+        source=job.source,
+        apply_url=job.apply_url,
         created_at=job.created_at,
         company=CompanyOut.model_validate(company),
     )
@@ -98,6 +104,7 @@ def list_jobs(
         )
     if low_competition:
         conditions.append(Job.applicant_count < LOW_COMPETITION_MAX)
+        conditions.append(Job.source == "native")
 
     if sort == "salary":
         order = [Job.salary_max_lpa.desc().nulls_last(), Job.id.desc()]

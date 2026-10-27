@@ -290,3 +290,6 @@ input[type="file"] { padding: 0.6rem 0.8rem; }
 .badge.pending { background: rgba(255, 159, 10, 0.2); color: #ffb84d; }
 .badge.unverified { background: rgba(255, 255, 255, 0.12); color: var(--muted); }
 .verify-note { padding: 0.8rem; border-radius: 14px; background: rgba(255, 255, 255, 0.06); font-size: 0.9rem; margin-bottom: 1rem; }
+
+.comp.unknown { color: var(--muted); }
+.job-card details p { white-space: pre-line; }

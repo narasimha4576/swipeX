@@ -5,6 +5,7 @@ export const COMP_LABEL = {
   low: "Low competition",
   medium: "Medium competition",
   high: "High competition",
+  unknown: "Competition unknown",
 };
 
 const GRADIENTS = [

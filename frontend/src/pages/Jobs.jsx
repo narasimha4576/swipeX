@@ -273,13 +273,14 @@ export default function Jobs() {
 
             <div className="row between foot muted small">
               <span>Posted {timeAgo(job.created_at)}</span>
-              <span>{job.applicant_count} applicants</span>
+              <span>{job.source === "native" ? `${job.applicant_count} applicants` : "Official listing"}</span>
             </div>
             <div className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</div>
 
             <details>
               <summary>Details</summary>
               <p className="muted">{job.description}</p>
+              {job.apply_url && (<a className="link" href={job.apply_url} target="_blank" rel="noreferrer">Open on company site</a>)}
             </details>
           </article>
         ))}

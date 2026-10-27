@@ -133,6 +133,8 @@ class JobOut(BaseModel):
     skills: list[str]
     applicant_count: int
     competition_level: str
+    source: str = "native"
+    apply_url: str | None = None
     created_at: datetime
     company: CompanyOut
 

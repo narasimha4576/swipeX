@@ -1,0 +1,62 @@
+[
+  {
+    "token": "stripe",
+    "name": "Stripe",
+    "company_type": "mnc"
+  },
+  {
+    "token": "airbnb",
+    "name": "Airbnb",
+    "company_type": "mnc"
+  },
+  {
+    "token": "databricks",
+    "name": "Databricks",
+    "company_type": "mnc"
+  },
+  {
+    "token": "coinbase",
+    "name": "Coinbase",
+    "company_type": "mnc"
+  },
+  {
+    "token": "twilio",
+    "name": "Twilio",
+    "company_type": "startup"
+  },
+  {
+    "token": "mongodb",
+    "name": "MongoDB",
+    "company_type": "mnc"
+  },
+  {
+    "token": "elastic",
+    "name": "Elastic",
+    "company_type": "mnc"
+  },
+  {
+    "token": "okta",
+    "name": "Okta",
+    "company_type": "mnc"
+  },
+  {
+    "token": "datadog",
+    "name": "Datadog",
+    "company_type": "mnc"
+  },
+  {
+    "token": "gitlab",
+    "name": "GitLab",
+    "company_type": "mnc"
+  },
+  {
+    "token": "lyft",
+    "name": "Lyft",
+    "company_type": "mnc"
+  },
+  {
+    "token": "groww",
+    "name": "Groww",
+    "company_type": "startup"
+  }
+]
