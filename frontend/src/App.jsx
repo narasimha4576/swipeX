@@ -3,14 +3,14 @@ import { AuthProvider, useAuth } from "./auth";
 import AuthPage from "./pages/AuthPage";
 import Discover from "./pages/Discover";
 import Jobs from "./pages/Jobs";
+import Applications from "./pages/Applications";
 import Profile from "./pages/Profile";
+import ResumeSection from "./pages/ResumeSection";
 import ExperienceSection from "./pages/ExperienceSection";
 import PortfolioSection from "./pages/PortfolioSection";
+import Workspace from "./pages/Workspace";
 import AdminUsers from "./pages/AdminUsers";
 import AdminCompanies from "./pages/AdminCompanies";
-import Applications from "./pages/Applications";
-import ResumeSection from "./pages/ResumeSection";
-import Workspace from "./pages/Workspace";
 
 function Icon({ children }) {
   return (
@@ -30,15 +30,21 @@ function Icon({ children }) {
 const ICONS = {
   discover: (
     <Icon>
-      <rect x="4" y="3" width="16" height="18" rx="4" />
+      <rect x="4" y="3" width="16" height="18" rx="2" />
       <path d="M12 16.5s-3.5-2-3.5-4.5a2 2 0 0 1 3.5-1.3 2 2 0 0 1 3.5 1.3c0 2.5-3.5 4.5-3.5 4.5z" />
     </Icon>
   ),
   jobs: (
     <Icon>
-      <rect x="3" y="7" width="18" height="13" rx="3" />
+      <rect x="3" y="7" width="18" height="13" rx="2" />
       <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
       <path d="M3 13h18" />
+    </Icon>
+  ),
+  applications: (
+    <Icon>
+      <path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+      <path d="M9 9h6M9 13h6M9 17h3" />
     </Icon>
   ),
   profile: (
@@ -49,16 +55,10 @@ const ICONS = {
   ),
   workspace: (
     <Icon>
-      <rect x="3" y="3" width="8" height="8" rx="2" />
-      <rect x="13" y="3" width="8" height="8" rx="2" />
-      <rect x="3" y="13" width="8" height="8" rx="2" />
-      <rect x="13" y="13" width="8" height="8" rx="2" />
-    </Icon>
-  ),
-  applications: (
-    <Icon>
-      <path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
-      <path d="M9 9h6M9 13h6M9 17h3" />
+      <rect x="3" y="3" width="8" height="8" rx="1" />
+      <rect x="13" y="3" width="8" height="8" rx="1" />
+      <rect x="3" y="13" width="8" height="8" rx="1" />
+      <rect x="13" y="13" width="8" height="8" rx="1" />
     </Icon>
   ),
   companies: (
@@ -81,15 +81,14 @@ const ICONS = {
 
 function ProfilePage() {
   return (
-    <>
+    <div className="profile-grid">
       <Profile />
       <ResumeSection />
       <ExperienceSection />
       <PortfolioSection />
-    </>
+    </div>
   );
 }
-
 
 const TABS = {
   job_seeker: [
@@ -98,7 +97,9 @@ const TABS = {
     ["/applications", "Applications", "applications"],
     ["/profile", "Profile", "profile"],
   ],
-  recruiter: [["/workspace", "Workspace", "workspace"], ["/jobs", "Jobs", "jobs"],
+  recruiter: [
+    ["/workspace", "Workspace", "workspace"],
+    ["/jobs", "Jobs", "jobs"],
   ],
   admin: [
     ["/admin/users", "Users", "users"],
@@ -118,10 +119,24 @@ function Shell() {
 
   return (
     <div className="app">
-      <header className="topbar glass">
+      <header className="topbar">
         <div className="brand">
           Swipe<span className="accent">X</span>
         </div>
+
+        <nav className="nav">
+          {tabs.map(([to, label, icon]) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+            >
+              {ICONS[icon]}
+              <span>{label}</span>
+            </NavLink>
+          ))}
+        </nav>
+
         <div className="who">
           <span className="name">{user.full_name}</span>
           <span className={`badge ${user.role}`}>{user.role.replace("_", " ")}</span>
@@ -144,19 +159,6 @@ function Shell() {
           <Route path="*" element={<Navigate to={home} replace />} />
         </Routes>
       </main>
-
-      <nav className="nav">
-        {tabs.map(([to, label, icon]) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
-          >
-            {ICONS[icon]}
-            <span>{label}</span>
-          </NavLink>
-        ))}
-      </nav>
     </div>
   );
 }
