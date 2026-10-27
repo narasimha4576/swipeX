@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
 import api, { errorMessage } from "../api";
+import CompanyLink from "./CompanyLink";
 import {
   COMP_LABEL,
   JOB_TYPE_LABEL,
@@ -71,7 +72,7 @@ function SwipeCard({ job, position, exitX, onSwipe }) {
         </div>
         <div className="job-title">
           <h3>{job.title}</h3>
-          <div className="muted">{job.company.name}</div>
+          <CompanyLink company={job.company} />
         </div>
       </div>
 

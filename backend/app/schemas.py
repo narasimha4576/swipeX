@@ -288,3 +288,41 @@ class AdminCompanyOut(CompanyOut):
     source: str = "native"
     owner_email: str | None = None
     jobs_count: int = 0
+
+
+class TrustSignal(BaseModel):
+    key: str
+    label: str
+    ok: bool
+    known: bool = True
+    applicable: bool = True
+    detail: str | None = None
+
+
+class TrustFacts(BaseModel):
+    founded_year: int | None = None
+    employees: int | None = None
+    headquarters: str | None = None
+    website: str | None = None
+    wikipedia_url: str | None = None
+    wikidata_url: str | None = None
+    description: str | None = None
+
+
+class HiringStats(BaseModel):
+    jobs_posted: int
+    open_jobs: int
+    applications: int
+    responded: int
+    response_rate: float | None = None
+    avg_response_days: float | None = None
+
+
+class TrustCardOut(BaseModel):
+    company: CompanyOut
+    level: Literal["strong", "good", "limited"]
+    signals: list[TrustSignal]
+    facts: TrustFacts
+    hiring: HiringStats | None = None
+    source: str
+    checked_at: str | None = None

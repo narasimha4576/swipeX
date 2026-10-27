@@ -16,6 +16,7 @@ from app.routers import (
     recruiter,
     resumes,
     swipes,
+    trust,
     verification,
 )
 
@@ -48,6 +49,7 @@ app.include_router(swipes.router)
 app.include_router(applications.router)
 app.include_router(recruiter.router)
 app.include_router(verification.recruiter_router)
+app.include_router(trust.router)
 
 
 @app.get("/health")

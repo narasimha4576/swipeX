@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api, { errorMessage } from "../api";
+import CompanyLink from "./CompanyLink";
 import { LEVEL_LABEL, TYPE_LABEL, logoColor, salary, timeAgo } from "../jobUtils";
 
 const STATUSES = [
@@ -155,7 +156,7 @@ export default function Applications() {
                 </div>
                 <div className="job-title">
                   <h3>{a.job.title}</h3>
-                  <div className="muted">{a.job.company.name}</div>
+                  <CompanyLink company={a.job.company} />
                 </div>
                 <span className={`badge ${a.status}`}>{STATUS_LABEL[a.status]}</span>
               </div>

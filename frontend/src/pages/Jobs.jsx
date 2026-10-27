@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api, { errorMessage } from "../api";
+import CompanyLink from "./CompanyLink";
 
 const TYPE_LABEL = { mnc: "MNC", startup: "Startup", new_startup: "New startup" };
 const JOB_TYPE_LABEL = { full_time: "Full-time", internship: "Internship" };
@@ -248,7 +249,7 @@ export default function Jobs() {
               </div>
               <div className="job-title">
                 <h3>{job.title}</h3>
-                <div className="muted">{job.company.name}</div>
+                <CompanyLink company={job.company} />
               </div>
               <span className={`badge ${job.company.company_type}`}>
                 {TYPE_LABEL[job.company.company_type] ?? job.company.company_type}

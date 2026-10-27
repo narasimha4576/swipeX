@@ -57,6 +57,8 @@ class Company(Base):
     verification_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     source: Mapped[str] = mapped_column(String(30), default="native", server_default="native")
     source_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    trust_data: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    enriched_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
 class Job(Base):
@@ -153,3 +155,36 @@ class RecruiterProfile(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
     company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"))
+
+
+from sqlalchemy import event, inspect  # noqa: E402
+
+
+class ApplicationEvent(Base):
+    __tablename__ = "application_events"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    application_id: Mapped[int] = mapped_column(
+        ForeignKey("applications.id", ondelete="CASCADE"), index=True
+    )
+    status: Mapped[str] = mapped_column(String(20))
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+@event.listens_for(Application, "after_insert")
+def log_status_on_insert(mapper, connection, target):
+    connection.execute(
+        ApplicationEvent.__table__.insert().values(
+            application_id=target.id, status=target.status
+        )
+    )
+
+
+@event.listens_for(Application, "after_update")
+def log_status_on_update(mapper, connection, target):
+    if inspect(target).attrs.status.history.has_changes():
+        connection.execute(
+            ApplicationEvent.__table__.insert().values(
+                application_id=target.id, status=target.status
+            )
+        )

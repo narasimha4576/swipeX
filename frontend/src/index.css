@@ -293,3 +293,25 @@ input[type="file"] { padding: 0.6rem 0.8rem; }
 
 .comp.unknown { color: var(--muted); }
 .job-card details p { white-space: pre-line; }
+
+.company-link { background: none; border: none; padding: 0; color: var(--muted); font: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; text-align: left; }
+.company-link:hover { color: var(--text); }
+.company-link svg { width: 14px; height: 14px; color: var(--green); flex-shrink: 0; }
+.sheet-backdrop { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-end; justify-content: center; background: rgba(5, 6, 20, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.sheet { width: min(640px, 100%); max-height: 88vh; overflow-y: auto; padding: 1rem 1.4rem 1.6rem; border-radius: 28px 28px 0 0; background: rgba(28, 30, 58, 0.85); animation: sheet-up 0.28s ease-out; }
+@keyframes sheet-up { from { transform: translateY(50px); opacity: 0; } to { transform: none; opacity: 1; } }
+.grabber { width: 42px; height: 5px; border-radius: 999px; background: rgba(255, 255, 255, 0.3); margin: 0 auto 1rem; }
+.sheet-title { margin: 1.3rem 0 0.4rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.signal { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.6rem 0; border-top: 1px solid var(--stroke); }
+.signal-icon { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; margin-top: 2px; }
+.signal-icon svg { width: 13px; height: 13px; }
+.signal-icon.ok { background: rgba(48, 209, 88, 0.25); color: #6ee08a; }
+.signal-icon.no { background: rgba(255, 69, 58, 0.22); color: #ff8a82; }
+.signal-icon.unknown { background: rgba(255, 255, 255, 0.14); color: var(--muted); }
+.level { padding: 0.25rem 0.75rem; border-radius: 999px; font-weight: 700; font-size: 0.75rem; white-space: nowrap; }
+.level.strong { background: rgba(48, 209, 88, 0.2); color: #6ee08a; }
+.level.good { background: rgba(10, 132, 255, 0.22); color: #7ebcff; }
+.level.limited { background: rgba(255, 159, 10, 0.2); color: #ffb84d; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.fact div { font-weight: 600; }
+.disclaimer { margin: 1.2rem 0 1rem; }
