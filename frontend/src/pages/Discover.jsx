@@ -71,7 +71,7 @@ function SwipeCard({ job, position, exitX, onSwipe }) {
           {job.company.name.charAt(0)}
         </div>
         <div className="job-title">
-          <h3>{job.title}</h3>
+          <h3><Link className="title-link" onPointerDownCapture={(e) => e.stopPropagation()} to={"/jobs/" + job.id}>{job.title}</Link></h3>
           <CompanyLink company={job.company} />
         </div>
       </div>

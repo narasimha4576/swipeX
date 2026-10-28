@@ -11,6 +11,8 @@ import PortfolioSection from "./pages/PortfolioSection";
 import Workspace from "./pages/Workspace";
 import AdminUsers from "./pages/AdminUsers";
 import AdminCompanies from "./pages/AdminCompanies";
+import JobDetail from "./pages/JobDetail";
+import ThemeToggle from "./pages/ThemeToggle";
 
 function Icon({ children }) {
   return (
@@ -138,6 +140,7 @@ function Shell() {
         </nav>
 
         <div className="who">
+          <ThemeToggle />
           <span className="name">{user.full_name}</span>
           <span className={`badge ${user.role}`}>{user.role.replace("_", " ")}</span>
           <span className="avatar">{user.full_name.trim().charAt(0).toUpperCase()}</span>
@@ -150,6 +153,7 @@ function Shell() {
       <main className="content">
         <Routes>
           <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/:id" element={<JobDetail />} />
           {user.role === "job_seeker" && <Route path="/discover" element={<Discover />} />}
           {user.role === "job_seeker" && <Route path="/applications" element={<Applications />} />}
           {user.role === "job_seeker" && <Route path="/profile" element={<ProfilePage />} />}

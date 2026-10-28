@@ -155,7 +155,7 @@ export default function Applications() {
                   {a.job.company.name.charAt(0)}
                 </div>
                 <div className="job-title">
-                  <h3>{a.job.title}</h3>
+                  <h3><Link className="title-link" to={"/jobs/" + a.job.id}>{a.job.title}</Link></h3>
                   <CompanyLink company={a.job.company} />
                 </div>
                 <span className={`badge ${a.status}`}>{STATUS_LABEL[a.status]}</span>

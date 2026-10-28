@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import api, { errorMessage } from "../api";
+import { Link } from "react-router-dom";
 import CompanyLink from "./CompanyLink";
 
 const TYPE_LABEL = { mnc: "MNC", startup: "Startup", new_startup: "New startup" };
 const JOB_TYPE_LABEL = { full_time: "Full-time", internship: "Internship" };
 const LEVEL_LABEL = { fresher: "Fresher", junior: "Junior", mid: "Mid-level", senior: "Senior" };
-const COMP_LABEL = { low: "Low competition", medium: "Medium competition", high: "High competition" };
+const COMP_LABEL = { low: "Low competition", medium: "Medium competition", high: "High competition", unknown: "Competition unknown" };
 const PAGE_SIZE = 9;
 
 const GRADIENTS = [
@@ -248,7 +249,7 @@ export default function Jobs() {
                 {job.company.name.charAt(0)}
               </div>
               <div className="job-title">
-                <h3>{job.title}</h3>
+                <h3><Link className="title-link" to={"/jobs/" + job.id}>{job.title}</Link></h3>
                 <CompanyLink company={job.company} />
               </div>
               <span className={`badge ${job.company.company_type}`}>
@@ -278,11 +279,7 @@ export default function Jobs() {
             </div>
             <div className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</div>
 
-            <details>
-              <summary>Details</summary>
-              <p className="muted">{job.description}</p>
-              {job.apply_url && (<a className="link" href={job.apply_url} target="_blank" rel="noreferrer">Open on company site</a>)}
-            </details>
+            <Link className="btn small details-link" to={"/jobs/" + job.id}>View details</Link>
           </article>
         ))}
       </div>

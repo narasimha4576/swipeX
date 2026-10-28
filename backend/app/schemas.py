@@ -326,3 +326,8 @@ class TrustCardOut(BaseModel):
     hiring: HiringStats | None = None
     source: str
     checked_at: str | None = None
+
+
+class MyJobStatus(BaseModel):
+    application_id: int
+    status: str

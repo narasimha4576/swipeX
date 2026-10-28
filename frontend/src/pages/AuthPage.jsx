@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../auth";
 import { errorMessage } from "../api";
+import ThemeToggle from "./ThemeToggle";
 
 export default function AuthPage() {
   const { user, login, register } = useAuth();
@@ -35,8 +36,19 @@ export default function AuthPage() {
 
   return (
     <div className="center">
+      <ThemeToggle floating />
       <div className="auth-wrap">
         <div className="hero">
+          <div className="cube-scene" aria-hidden="true">
+            <div className="cube">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
           <h1>
             Swipe<span className="accent">X</span>
           </h1>

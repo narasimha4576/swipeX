@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.deps import get_db, require_roles
 from app.models import Application, Company, Job, Resume, Swipe, User
 from app.routers.jobs import job_to_out
-from app.schemas import ApplicationOut, ApplyIn
+from app.schemas import ApplicationOut, ApplyIn, MyJobStatus
 
 router = APIRouter(prefix="/applications", tags=["applications"])
 seeker_only = require_roles("job_seeker")
@@ -144,3 +144,19 @@ def mark_applied_on_company_site(
     db.refresh(application)
     company = db.get(Company, job.company_id)
     return to_out(application, job, company, None)
+
+
+@router.get("/job/{job_id}", response_model=MyJobStatus | None)
+def my_status_for_job(
+    job_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(seeker_only),
+):
+    application = db.scalar(
+        select(Application).where(
+            Application.user_id == user.id, Application.job_id == job_id
+        )
+    )
+    if application is None:
+        return None
+    return MyJobStatus(application_id=application.id, status=application.status)
