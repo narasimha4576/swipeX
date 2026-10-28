@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from typing import Literal
 
@@ -331,3 +332,105 @@ class TrustCardOut(BaseModel):
 class MyJobStatus(BaseModel):
     application_id: int
     status: str
+
+
+class ApplicationDetailsIn(BaseModel):
+    phone: str | None = Field(default=None, max_length=30)
+    linkedin_url: str | None = Field(default=None, max_length=255)
+    github_url: str | None = Field(default=None, max_length=255)
+    portfolio_url: str | None = Field(default=None, max_length=255)
+    college: str | None = Field(default=None, max_length=200)
+    degree: str | None = Field(default=None, max_length=100)
+    discipline: str | None = Field(default=None, max_length=100)
+    graduation_year: int | None = Field(default=None, ge=1980, le=2100)
+    authorized_countries: str | None = Field(default=None, max_length=200)
+    requires_sponsorship: bool = False
+    willing_to_relocate: bool = False
+    notice_period_days: int | None = Field(default=None, ge=0, le=365)
+    current_ctc_lpa: float | None = Field(default=None, ge=0, le=1000)
+    expected_ctc_lpa: float | None = Field(default=None, ge=0, le=1000)
+    cover_letter: str | None = Field(default=None, max_length=3000)
+
+    @field_validator(
+        "phone", "linkedin_url", "github_url", "portfolio_url", "college", "degree",
+        "discipline", "authorized_countries", "cover_letter",
+        mode="before",
+    )
+    @classmethod
+    def blank_to_none(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+            return value or None
+        return value
+
+    @field_validator("phone")
+    @classmethod
+    def check_phone(cls, value):
+        if value is None:
+            return value
+        digits = re.sub(r"\D", "", value)
+        if not re.fullmatch(r"[0-9+()\-\s]+", value) or not 7 <= len(digits) <= 15:
+            raise ValueError("Enter a valid phone number, for example +91 98765 43210")
+        return value
+
+    @field_validator("linkedin_url", "github_url", "portfolio_url")
+    @classmethod
+    def check_links(cls, value):
+        if value is not None and not value.startswith(("http://", "https://")):
+            raise ValueError("Links must start with http:// or https://")
+        return value
+
+
+class ApplicationDetailsOut(ApplicationDetailsIn):
+    ready: bool
+    missing: list[str]
+
+
+class AutofillJob(BaseModel):
+    id: int
+    title: str
+    company: str
+    apply_url: str | None = None
+
+
+class AutofillApplicant(BaseModel):
+    first_name: str
+    last_name: str
+    full_name: str
+    email: str
+    phone: str | None = None
+    location: str | None = None
+    headline: str | None = None
+    linkedin_url: str | None = None
+    github_url: str | None = None
+    portfolio_url: str | None = None
+    website: str | None = None
+    college: str | None = None
+    degree: str | None = None
+    discipline: str | None = None
+    graduation_year: int | None = None
+    authorized_countries: str | None = None
+    requires_sponsorship: bool = False
+    willing_to_relocate: bool = False
+    notice_period_days: int | None = None
+    current_ctc_lpa: float | None = None
+    expected_ctc_lpa: float | None = None
+    cover_letter: str | None = None
+    how_did_you_hear: str = "SwipeX"
+    skills: list[str] = []
+
+
+class AutofillResume(BaseModel):
+    id: int
+    name: str
+    filename: str
+    mime: str = "application/pdf"
+    data_base64: str | None = None
+
+
+class AutofillPayload(BaseModel):
+    job: AutofillJob
+    applicant: AutofillApplicant
+    resume: AutofillResume | None = None
+    ready: bool
+    missing: list[str]

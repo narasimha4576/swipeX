@@ -39,6 +39,25 @@ class Profile(Base):
     experience_years: Mapped[float] = mapped_column(Float, default=0)
     skills: Mapped[list] = mapped_column(JSON, default=list)
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    linkedin_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    github_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    portfolio_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    college: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    degree: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    discipline: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    graduation_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    authorized_countries: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    requires_sponsorship: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false"
+    )
+    willing_to_relocate: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false"
+    )
+    notice_period_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    current_ctc_lpa: Mapped[float | None] = mapped_column(Float, nullable=True)
+    expected_ctc_lpa: Mapped[float | None] = mapped_column(Float, nullable=True)
+    cover_letter: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
 class Company(Base):

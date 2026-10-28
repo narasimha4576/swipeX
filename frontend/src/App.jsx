@@ -12,6 +12,8 @@ import Workspace from "./pages/Workspace";
 import AdminUsers from "./pages/AdminUsers";
 import AdminCompanies from "./pages/AdminCompanies";
 import JobDetail from "./pages/JobDetail";
+import ApplyReview from "./pages/ApplyReview";
+import ApplicationDetailsSection from "./pages/ApplicationDetailsSection";
 import ThemeToggle from "./pages/ThemeToggle";
 
 function Icon({ children }) {
@@ -85,6 +87,7 @@ function ProfilePage() {
   return (
     <div className="profile-grid">
       <Profile />
+      <ApplicationDetailsSection />
       <ResumeSection />
       <ExperienceSection />
       <PortfolioSection />
@@ -154,6 +157,7 @@ function Shell() {
         <Routes>
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
+          {user.role === "job_seeker" && <Route path="/jobs/:id/apply" element={<ApplyReview />} />}
           {user.role === "job_seeker" && <Route path="/discover" element={<Discover />} />}
           {user.role === "job_seeker" && <Route path="/applications" element={<Applications />} />}
           {user.role === "job_seeker" && <Route path="/profile" element={<ProfilePage />} />}

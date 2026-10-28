@@ -233,7 +233,8 @@ export default function JobDetail() {
 
               {!applied && official && (
                 <>
-                  <button className="btn primary" onClick={applyOnCompanySite} disabled={busy}>
+                  <Link className="btn primary" to={"/jobs/" + job.id + "/apply"}>Review and autofill</Link>
+                  <button className="btn" style={{ width: "100%" }} onClick={applyOnCompanySite} disabled={busy}>
                     Apply on company site
                   </button>
                   {waiting && (
