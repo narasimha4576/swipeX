@@ -14,7 +14,27 @@ export function errorMessage(error) {
   const detail = error?.response?.data?.detail;
   if (typeof detail === "string") return detail;
   if (Array.isArray(detail)) {
-    return detail.map((d) => d.msg.replace("Value error, ", "")).join(". ");
+    const names = {
+      current_ctc_lpa: "Current CTC",
+      expected_ctc_lpa: "Expected CTC",
+      notice_period_days: "Notice period",
+      graduation_year: "Graduation year",
+      phone: "Phone",
+      linkedin_url: "LinkedIn link",
+      github_url: "GitHub link",
+      portfolio_url: "Portfolio link",
+      cover_letter: "Cover letter",
+      experience_years: "Experience",
+      salary_min_lpa: "Minimum salary",
+      salary_max_lpa: "Maximum salary",
+    };
+    return detail
+      .map((d) => {
+        const field = names[d.loc[d.loc.length - 1]];
+        const message = d.msg.replace("Value error, ", "");
+        return field ? `${field}: ${message}` : message;
+      })
+      .join(". ");
   }
   return "Something went wrong. Is the backend running?";
 }

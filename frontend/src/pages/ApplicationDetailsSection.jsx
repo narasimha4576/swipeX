@@ -72,6 +72,18 @@ export default function ApplicationDetailsSection() {
     e.preventDefault();
     setStatus({ type: "", text: "" });
     try {
+      for (const [key, label] of [
+        ["current_ctc_lpa", "Current CTC"],
+        ["expected_ctc_lpa", "Expected CTC"],
+      ]) {
+        if (form[key] !== "" && Number(form[key]) > 1000) {
+          setStatus({
+            type: "error",
+            text: `${label} is in lakhs per year. Enter 6.5 for 6,50,000 rupees, not the full amount.`,
+          });
+          return;
+        }
+      }
       const { data } = await api.put("/autofill/details", toServer(form));
       setForm(fromServer(data));
       setMissing(data.missing);
@@ -172,21 +184,23 @@ export default function ApplicationDetailsSection() {
         </div>
         <div className="grid2">
           <label className="field">
-            <span>Current CTC (LPA)</span>
+            <span>Current CTC (lakhs per year, e.g. 6.5)</span>
             <input
               type="number"
               min="0"
               step="0.1"
+              max="1000"
               value={form.current_ctc_lpa}
               onChange={set("current_ctc_lpa")}
             />
           </label>
           <label className="field">
-            <span>Expected CTC (LPA)</span>
+            <span>Expected CTC (lakhs per year, e.g. 8)</span>
             <input
               type="number"
               min="0"
               step="0.1"
+              max="1000"
               value={form.expected_ctc_lpa}
               onChange={set("expected_ctc_lpa")}
             />
