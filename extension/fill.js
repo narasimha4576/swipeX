@@ -104,7 +104,7 @@
   function clean(text) {
     return String(text || "")
       .replace(/[_\[\]]+/g, " ")
-      .replace(/[*:]/g, " ")
+      .replace(/[*:\u2731\u2217]/g, " ")
       .replace(/\s+/g, " ")
       .trim()
       .toLowerCase();

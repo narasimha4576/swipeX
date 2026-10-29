@@ -1,5 +1,11 @@
-export const TYPE_LABEL = { mnc: "MNC", startup: "Startup", new_startup: "New startup" };
-export const JOB_TYPE_LABEL = { full_time: "Full-time", internship: "Internship" };
+export const TYPE_LABEL = { mnc: "MNC", startup: "Startup", new_startup: "New startup", other: "Company" };
+export const JOB_TYPE_LABEL = {
+  full_time: "Full-time",
+  internship: "Internship",
+  apprenticeship: "Apprenticeship",
+  part_time: "Part-time",
+  contract: "Contract",
+};
 export const LEVEL_LABEL = { fresher: "Fresher", junior: "Junior", mid: "Mid-level", senior: "Senior" };
 export const COMP_LABEL = {
   low: "Low competition",

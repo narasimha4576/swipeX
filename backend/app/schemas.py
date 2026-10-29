@@ -187,7 +187,7 @@ class JobCreate(BaseModel):
     description: str = Field(min_length=20, max_length=5000)
     location: str | None = Field(default=None, max_length=120)
     is_remote: bool = False
-    job_type: Literal["full_time", "internship"] = "full_time"
+    job_type: Literal["full_time", "internship", "apprenticeship", "part_time", "contract"] = "full_time"
     experience_level: Literal["fresher", "junior", "mid", "senior"] = "fresher"
     salary_min_lpa: float | None = Field(default=None, ge=0, le=500)
     salary_max_lpa: float | None = Field(default=None, ge=0, le=500)
@@ -440,3 +440,14 @@ class SkippedOut(BaseModel):
     job: JobOut
     skipped_at: datetime
     days_left: int
+
+
+class SafetyFlag(BaseModel):
+    severity: Literal["high", "medium", "low"]
+    text: str
+
+
+class SafetyOut(BaseModel):
+    level: Literal["low", "medium", "high"]
+    flags: list[SafetyFlag]
+    good: list[str]

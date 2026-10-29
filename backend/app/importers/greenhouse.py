@@ -19,7 +19,8 @@ LOCATION_KEYWORDS = (
 ROLE_KEYWORDS = (
     "engineer", "engineering", "developer", "software", "data", "machine learning",
     "ml", "ai", "analyst", "analytics", "scientist", "intern", "sde", "backend",
-    "frontend", "full stack", "fullstack", "devops", "sre", "research",
+    "frontend", "full stack", "fullstack", "devops", "sre", "research", "internship",
+    "apprentice", "apprenticeship", "trainee",
 )
 
 ROLE_RE = re.compile(r"\b(" + "|".join(re.escape(k) for k in ROLE_KEYWORDS) + r")\b", re.I)
@@ -27,7 +28,7 @@ SENIOR_RE = re.compile(
     r"\b(senior|sr|staff|principal|lead|manager|director|architect|vp|head of)\b", re.I
 )
 FRESHER_RE = re.compile(
-    r"\b(intern|internship|graduate|new grad|fresher|entry|junior|associate|trainee)\b", re.I
+    r"\b(intern|internship|graduate|new grad|fresher|entry|junior|associate|trainee|apprentice|apprenticeship)\b", re.I
 )
 
 
@@ -100,9 +101,26 @@ def to_job_fields(raw: dict) -> dict | None:
         "description": description,
         "location": location[:120] or None,
         "is_remote": any(w in location.lower() for w in ("remote", "anywhere", "worldwide")),
-        "job_type": "internship" if "intern" in title.lower() else "full_time",
+        "job_type": job_type_for(title),
         "experience_level": infer_level(title),
         "skills": extract_skills(f"{title}\n{description}", limit=12),
         "apply_url": apply_url[:1000],
         "created_at": parse_time(raw.get("first_published")) or parse_time(raw.get("updated_at")),
     }
+
+
+SOURCE = "greenhouse"
+LABEL = "Greenhouse"
+
+
+def board_url(token: str) -> str:
+    return f"https://boards.greenhouse.io/{token}"
+
+
+def job_type_for(title: str) -> str:
+    lowered = title.lower()
+    if re.search(r"\bapprentice(s|ship|ships)?\b", lowered):
+        return "apprenticeship"
+    if re.search(r"\bintern(s|ship|ships)?\b", lowered):
+        return "internship"
+    return "full_time"

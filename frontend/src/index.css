@@ -738,3 +738,15 @@ a.btn.primary { display: block; text-align: center; }
 .eye svg { width: 20px; height: 20px; }
 .update-banner { width: 100%; margin: 0.8rem 0; padding: 0.7rem; font-family: var(--mono); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #161616; background: var(--orange); border: 1px solid var(--ink); cursor: pointer; animation: rise 0.3s ease backwards; }
 .update-banner:hover { background: var(--orange-dark); }
+
+.warn-note { padding-left: 0.5rem; border-left: 3px solid var(--amber); color: var(--amber); font-size: 0.74rem; font-weight: 700; }
+.level.high { color: var(--red); }
+.badge.other { color: var(--muted); }
+.portals { margin-top: 1.25rem; }
+.safety { margin: 1.2rem 0; padding: 1rem; background: var(--white); border: 1px solid var(--line-strong); }
+.safety.high { border-color: var(--red); }
+.safety.medium { border-color: var(--amber); }
+.safety.low { border-color: var(--green); }
+.safety .signal-icon { font-size: 0.8rem; font-weight: 700; }
+.tips { margin-top: 0.8rem; }
+.tips ul { margin: 0.6rem 0 0; padding-left: 1.1rem; font-size: 0.85rem; line-height: 1.6; }

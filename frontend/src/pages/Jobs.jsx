@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import api, { errorMessage } from "../api";
 import CompanyLink from "./CompanyLink";
+import OtherPortals from "./OtherPortals";
 import {
   COMP_LABEL,
   JOB_TYPE_LABEL,
@@ -17,6 +18,7 @@ const REFRESH_MS = 60000;
 
 const EMPTY = {
   q: "",
+  verified_only: true,
   company_type: "",
   job_type: "",
   experience_level: "",
@@ -39,6 +41,7 @@ const QUICK = [
   ["Low competition", "low_competition", true],
   ["Last 7 days", "max_age_days", 7],
   ["Internships", "job_type", "internship"],
+  ["Apprenticeships", "job_type", "apprenticeship"],
 ];
 
 function toParams(f, page) {
@@ -47,6 +50,7 @@ function toParams(f, page) {
   ["company_type", "job_type", "experience_level", "location", "skill"].forEach((k) => {
     if (typeof f[k] === "string" && f[k].trim()) p[k] = f[k].trim();
   });
+  if (!f.verified_only) p.verified_only = false;
   if (f.remote) p.remote = true;
   if (f.fresher_friendly) p.fresher_friendly = true;
   if (f.low_competition) p.low_competition = true;
@@ -172,6 +176,7 @@ export default function Jobs() {
         >
           Filters{panelCount > 0 ? ` (${panelCount})` : ""}
         </button>
+        <button className={filters.verified_only ? "fchip on" : "fchip"} onClick={() => update({ verified_only: !filters.verified_only })}>Verified only</button>
         {QUICK.map(([label, key, value]) => (
           <button
             key={label}
@@ -296,6 +301,7 @@ export default function Jobs() {
               <span>{LEVEL_LABEL[job.experience_level] ?? job.experience_level}</span>
             </div>
 
+            {job.company.verification_status !== "verified" && (<div className="warn-note">Unverified company. Check the safety details before applying.</div>)}
             <div className="salary">{salary(job)}</div>
 
             <div className="chips">
@@ -309,7 +315,7 @@ export default function Jobs() {
             <div className="row between foot muted small">
               <span>Posted {timeAgo(job.created_at)}</span>
               <span>
-                {job.source === "native" ? `${job.applicant_count} applicants` : "Official listing"}
+                {job.source === "native" ? `${job.applicant_count} applicants` : job.source === "adzuna" ? "Aggregated listing" : "Official listing"}
               </span>
             </div>
             <div className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</div>
@@ -320,6 +326,8 @@ export default function Jobs() {
           </article>
         ))}
       </div>
+
+      <OtherPortals query={filters.q} location={filters.location} />
 
       {data.total > 0 && (
         <div className="pager">

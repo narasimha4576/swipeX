@@ -7,7 +7,8 @@ from sqlalchemy.orm import Session
 
 from app.deps import get_current_user, get_db
 from app.models import Company, Job, User
-from app.schemas import CompanyOut, JobOut, JobPage
+from app.schemas import CompanyOut, JobOut, JobPage, SafetyFlag, SafetyOut
+from app.safety import analyze
 
 router = APIRouter(tags=["jobs"])
 
@@ -59,6 +60,7 @@ def list_jobs(
     skill: str | None = None,
     min_salary: float | None = Query(None, ge=0),
     max_age_days: int | None = Query(None, ge=1, le=365),
+    verified_only: bool = True,
     fresher_friendly: bool = False,
     low_competition: bool = False,
     sort: Literal["newest", "salary", "competition"] = "newest",
@@ -67,7 +69,11 @@ def list_jobs(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    conditions = [Job.is_active.is_(True), Company.verification_status == "verified"]
+    conditions = [Job.is_active.is_(True)]
+    if verified_only:
+        conditions.append(Company.verification_status == "verified")
+    else:
+        conditions.append(Company.verification_status != "rejected")
 
     if q and q.strip():
         pattern = f"%{q.strip()}%"
@@ -100,7 +106,7 @@ def list_jobs(
         conditions.append(Job.created_at >= since)
     if fresher_friendly:
         conditions.append(
-            or_(Job.experience_level == "fresher", Job.job_type == "internship")
+            or_(Job.experience_level == "fresher", Job.job_type.in_(["internship", "apprenticeship"]))
         )
     if low_competition:
         conditions.append(Job.applicant_count < LOW_COMPETITION_MAX)
@@ -145,7 +151,7 @@ def get_job(
     stmt = (
         select(Job, Company)
         .join(Company, Job.company_id == Company.id)
-        .where(Job.id == job_id, Job.is_active.is_(True), Company.verification_status == "verified")
+        .where(Job.id == job_id, Job.is_active.is_(True), Company.verification_status != "rejected")
     )
     row = db.execute(stmt).first()
     if row is None:
@@ -163,3 +169,24 @@ def list_companies(
     if company_type:
         stmt = stmt.where(Company.company_type == company_type)
     return db.scalars(stmt).all()
+
+
+@router.get("/jobs/{job_id}/safety", response_model=SafetyOut)
+def job_safety(
+    job_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    row = db.execute(
+        select(Job, Company)
+        .join(Company, Job.company_id == Company.id)
+        .where(Job.id == job_id, Company.verification_status != "rejected")
+    ).first()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+    result = analyze(row[0], row[1])
+    return SafetyOut(
+        level=result.level,
+        flags=[SafetyFlag(severity=f.severity, text=f.text) for f in result.flags],
+        good=result.good,
+    )

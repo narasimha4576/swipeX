@@ -14,6 +14,9 @@
     {
       "matches": [
         "https://*.greenhouse.io/*",
+        "https://jobs.lever.co/*",
+        "https://jobs.eu.lever.co/*",
+        "https://jobs.ashbyhq.com/*",
         "http://localhost:5173/autofill-test.html*",
         "http://127.0.0.1:5173/autofill-test.html*"
       ],

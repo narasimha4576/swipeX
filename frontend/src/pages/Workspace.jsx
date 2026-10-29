@@ -283,6 +283,9 @@ function PostJobSection({ company, onPosted }) {
               <select value={form.job_type} onChange={set("job_type")}>
                 <option value="full_time">Full-time</option>
                 <option value="internship">Internship</option>
+                <option value="apprenticeship">Apprenticeship</option>
+                <option value="part_time">Part-time</option>
+                <option value="contract">Contract</option>
               </select>
             </label>
             <label className="field">

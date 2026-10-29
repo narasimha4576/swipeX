@@ -20,7 +20,7 @@ def company_trust(
     if company is None:
         raise HTTPException(status_code=404, detail="Company not found")
 
-    allowed = company.verification_status == "verified" or user.role == "admin"
+    allowed = company.verification_status != "rejected" or user.role == "admin"
     if not allowed and user.role == "recruiter":
         allowed = (
             db.scalar(

@@ -92,7 +92,7 @@ def autofill_payload(
         .where(
             Job.id == job_id,
             Job.is_active.is_(True),
-            Company.verification_status == "verified",
+            Company.verification_status != "rejected",
         )
     ).first()
     if row is None:

@@ -16,6 +16,7 @@ from app.models import (
     User,
 )
 from app.routers.jobs import job_to_out
+from app.safety import check_text
 from app.routers.resumes import UPLOAD_DIR
 from app.schemas import (
     ApplicantOut,
@@ -118,6 +119,13 @@ def post_job(
     company = get_my_company(db, user)
     if company is None:
         raise HTTPException(status_code=400, detail="Create your company profile first")
+
+    serious = [f for f in check_text(f"{data.title}\n{data.description}", official=True) if f.severity == "high"]
+    if serious:
+        raise HTTPException(
+            status_code=400,
+            detail="This posting cannot be published. " + serious[0].text,
+        )
 
     location = (data.location or "").strip() or ("Remote" if data.is_remote else None)
     job = Job(

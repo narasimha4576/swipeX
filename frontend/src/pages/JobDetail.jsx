@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import api, { errorMessage } from "../api";
 import { useAuth } from "../auth";
 import CompanyLink from "./CompanyLink";
+import SafetyCard from "./SafetyCard";
 import {
   COMP_LABEL,
   JOB_TYPE_LABEL,
@@ -161,7 +162,7 @@ export default function JobDetail() {
                 <span className={`badge ${job.company.company_type}`}>
                   {TYPE_LABEL[job.company.company_type] ?? job.company.company_type}
                 </span>
-                {official && <span className="badge mnc">Official listing</span>}
+                {official && <span className="badge mnc">{job.source === "adzuna" ? "Aggregated listing" : "Official listing"}</span>}
               </div>
             </div>
           </div>
@@ -193,6 +194,8 @@ export default function JobDetail() {
             </span>
             <span className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</span>
           </div>
+
+          <SafetyCard jobId={job.id} />
 
           <h4 className="sheet-title">About this role</h4>
           <div className="description">{job.description}</div>

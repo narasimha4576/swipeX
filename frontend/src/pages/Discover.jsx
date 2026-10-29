@@ -103,7 +103,7 @@ function SwipeCard({ job, position, exitX, onSwipe }) {
 
       <div className="row between foot muted small">
         <span>Posted {timeAgo(job.created_at)}</span>
-        <span>{job.source === "native" ? `${job.applicant_count} applicants` : "Official listing"}</span>
+        <span>{job.source === "native" ? `${job.applicant_count} applicants` : job.source === "adzuna" ? "Aggregated listing" : "Official listing"}</span>
       </div>
     </motion.div>
   );
