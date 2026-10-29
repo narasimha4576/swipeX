@@ -17,6 +17,7 @@ from app.routers import (
     resumes,
     swipes,
     autofill,
+    explore,
     trust,
     verification,
 )
@@ -52,6 +53,7 @@ app.include_router(recruiter.router)
 app.include_router(verification.recruiter_router)
 app.include_router(trust.router)
 app.include_router(autofill.router)
+app.include_router(explore.router)
 
 
 @app.get("/health")

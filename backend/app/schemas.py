@@ -451,3 +451,59 @@ class SafetyOut(BaseModel):
     level: Literal["low", "medium", "high"]
     flags: list[SafetyFlag]
     good: list[str]
+
+
+class CompanyBrief(BaseModel):
+    id: int
+    name: str
+    company_type: str
+    location: str | None = None
+    verification_status: str
+    open_jobs: int
+
+
+class PublicMatch(BaseModel):
+    qid: str
+    label: str
+    description: str
+
+
+class SearchOut(BaseModel):
+    companies: list[CompanyBrief]
+    public: list[PublicMatch]
+
+
+class JobBrief(BaseModel):
+    id: int
+    title: str
+    location: str | None = None
+    job_type: str
+    is_remote: bool
+    created_at: datetime
+
+
+class NewsItem(BaseModel):
+    title: str
+    link: str
+    source: str | None = None
+    published_at: str | None = None
+
+
+class CompanyOverview(BaseModel):
+    name: str
+    kind: Literal["swipex", "public"]
+    company: CompanyOut | None = None
+    swipex_company_id: int | None = None
+    description: str | None = None
+    facts: TrustFacts
+    trust_level: str | None = None
+    jobs: list[JobBrief]
+    news: list[NewsItem]
+    ai_available: bool
+
+
+class SummaryOut(BaseModel):
+    about: str
+    recent: list[str]
+    hiring: str
+    check_before_applying: list[str]

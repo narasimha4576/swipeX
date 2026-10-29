@@ -116,3 +116,33 @@ def fetch_facts(qid: str, client: httpx.Client) -> dict:
         ),
         "wikidata_url": f"https://www.wikidata.org/wiki/{qid}",
     }
+
+
+def search_companies(query: str, client: httpx.Client, limit: int = 6) -> list[dict]:
+    response = client.get(
+        API,
+        params={
+            "action": "wbsearchentities",
+            "search": query,
+            "language": "en",
+            "format": "json",
+            "type": "item",
+            "limit": 10,
+        },
+        timeout=10,
+    )
+    response.raise_for_status()
+    found = []
+    for item in response.json().get("search", []):
+        description = (item.get("description") or "").lower()
+        if any(word in description for word in COMPANY_WORDS):
+            found.append(
+                {
+                    "qid": item["id"],
+                    "label": item.get("label") or item["id"],
+                    "description": item.get("description") or "",
+                }
+            )
+        if len(found) >= limit:
+            break
+    return found

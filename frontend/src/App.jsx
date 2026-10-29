@@ -13,6 +13,8 @@ import Workspace from "./pages/Workspace";
 import AdminUsers from "./pages/AdminUsers";
 import AdminCompanies from "./pages/AdminCompanies";
 import JobDetail from "./pages/JobDetail";
+import CompanySearch from "./pages/CompanySearch";
+import CompanyProfile from "./pages/CompanyProfile";
 import ApplyReview from "./pages/ApplyReview";
 import ApplicationDetailsSection from "./pages/ApplicationDetailsSection";
 import ThemeToggle from "./pages/ThemeToggle";
@@ -105,6 +107,7 @@ const TABS = {
   job_seeker: [
     ["/discover", "Discover", "discover"],
     ["/jobs", "Jobs", "jobs"],
+    ["/companies", "Companies", "companies"],
     ["/picks", "Picks", "picks"],
     ["/applications", "Applications", "applications"],
     ["/profile", "Profile", "profile"],
@@ -164,6 +167,9 @@ function Shell() {
         <Routes>
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
+          <Route path="/companies" element={<CompanySearch />} />
+          <Route path="/companies/public/:qid" element={<CompanyProfile kind="public" />} />
+          <Route path="/companies/:id" element={<CompanyProfile kind="swipex" />} />
           {user.role === "job_seeker" && <Route path="/jobs/:id/apply" element={<ApplyReview />} />}
           {user.role === "job_seeker" && <Route path="/discover" element={<Discover />} />}
           {user.role === "job_seeker" && <Route path="/applications" element={<Applications />} />}

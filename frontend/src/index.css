@@ -750,3 +750,15 @@ a.btn.primary { display: block; text-align: center; }
 .safety .signal-icon { font-size: 0.8rem; font-weight: 700; }
 .tips { margin-top: 0.8rem; }
 .tips ul { margin: 0.6rem 0 0; padding-left: 1.1rem; font-size: 0.85rem; line-height: 1.6; }
+
+.company-card { color: inherit; text-decoration: none; }
+.news-item { display: block; padding: 0.7rem 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none; }
+.news-title { font-weight: 600; font-size: 0.92rem; }
+.news-item:hover .news-title { text-decoration: underline; text-decoration-color: var(--orange); text-underline-offset: 3px; }
+.job-row { display: flex; justify-content: space-between; gap: 1rem; padding: 0.7rem 0; border-top: 1px solid var(--line); }
+.ai-card ul { margin: 0.4rem 0 0; padding-left: 1.1rem; font-size: 0.88rem; line-height: 1.6; }
+.ai-note { margin-top: 0.8rem; font-size: 0.75rem; }
+.nav-link span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 819px) {
+  .nav-link { font-size: 0.56rem; }
+}

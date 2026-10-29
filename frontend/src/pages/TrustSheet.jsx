@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import api, { errorMessage } from "../api";
 import { TYPE_LABEL, logoColor } from "../jobUtils";
 
@@ -172,6 +173,7 @@ export default function TrustSheet({ companyId, onClose }) {
               be incomplete.
               {card.checked_at ? ` Checked on ${card.checked_at.slice(0, 10)}.` : ""}
             </p>
+            <Link className="btn small" style={{ display: "inline-block", marginBottom: "0.8rem" }} to={"/companies/" + card.company.id} onClick={onClose}>View company page</Link>
             <button className="btn primary" onClick={onClose}>
               Close
             </button>
