@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SwipeX autofill practice form</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem 4rem; }
+    label { display: block; margin: 0.9rem 0 0.2rem; font-weight: 600; }
+    input, textarea, select { width: 100%; padding: 0.5rem; box-sizing: border-box; }
+    fieldset { margin: 1rem 0; }
+    fieldset label { display: inline-block; margin-right: 1rem; font-weight: 400; }
+    fieldset input { width: auto; }
+    .note { background: #fff3e8; border: 1px solid #ff6a1a; padding: 0.8rem; margin: 1rem 0; }
+    button { padding: 0.6rem 1rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Autofill practice form</h1>
+  <div class="note">
+    This is a harmless practice form. Nothing here is sent anywhere. Click the button to run a
+    test with made-up details.
+  </div>
+  <button id="start" type="button">Start autofill test</button>
+  <p id="status">Checking for the extension...</p>
+
+  <form id="application" onsubmit="event.preventDefault(); alert('Practice form: nothing was sent.');">
+    <label for="first_name">First Name *</label>
+    <input id="first_name" name="first_name" required />
+
+    <label for="last_name">Last Name *</label>
+    <input id="last_name" name="last_name" required />
+
+    <label for="email">Email *</label>
+    <input id="email" name="email" type="email" required />
+
+    <label for="phone">Phone</label>
+    <input id="phone" name="phone" type="tel" />
+
+    <label for="resume">Resume/CV *</label>
+    <input id="resume" name="resume" type="file" required />
+
+    <label for="cover_letter">Cover Letter</label>
+    <textarea id="cover_letter" name="cover_letter" rows="4"></textarea>
+
+    <label for="linkedin">LinkedIn Profile</label>
+    <input id="linkedin" name="linkedin" />
+
+    <label for="website">Website</label>
+    <input id="website" name="website" />
+
+    <label for="notice">Notice period</label>
+    <input id="notice" name="notice" />
+
+    <label for="ctc">Expected CTC</label>
+    <input id="ctc" name="ctc" />
+
+    <label for="school">School</label>
+    <input id="school" name="school" />
+
+    <label for="auth_in">Are you legally authorized to work in India?</label>
+    <select id="auth_in" name="auth_in"><option value="">Select...</option><option>Yes</option><option>No</option></select>
+
+    <label for="auth_us">Are you legally authorized to work in the United States?</label>
+    <select id="auth_us" name="auth_us"><option value="">Select...</option><option>Yes</option><option>No</option></select>
+
+    <label for="sponsor">Will you now or in the future require visa sponsorship?</label>
+    <select id="sponsor" name="sponsor"><option value="">Select...</option><option>Yes</option><option>No</option></select>
+
+    <fieldset>
+      <legend>Are you willing to relocate?</legend>
+      <label><input type="radio" name="relocate" value="yes" /> Yes</label>
+      <label><input type="radio" name="relocate" value="no" /> No</label>
+    </fieldset>
+
+    <label for="gender">Gender (optional)</label>
+    <select id="gender" name="gender"><option value="">Select...</option><option>Male</option><option>Female</option><option>Decline to self-identify</option></select>
+
+    <label for="why">Why do you want to work here? *</label>
+    <textarea id="why" name="why" rows="3" required></textarea>
+
+    <button type="submit">Submit application (practice, nothing is sent)</button>
+  </form>
+
+  <script>
+    var ready = false;
+    function status(text) { document.getElementById("status").textContent = text; }
+
+    window.addEventListener("message", function (event) {
+      var data = event.data;
+      if (!data || data.source !== "swipex-extension") return;
+      if (data.type === "READY") { ready = true; status("Extension detected. Click the button to run the test."); }
+      if (data.type === "AUTOFILL_ACK") {
+        status(data.ok ? "Accepted. A new tab opened with the filled practice form." : "The extension said: " + (data.error || "not ok"));
+      }
+    });
+    window.postMessage({ source: "swipex-web", type: "PING" }, window.location.origin);
+    setTimeout(function () { if (!ready) status("Extension not detected yet. Install it, then refresh this page."); }, 1000);
+
+    document.getElementById("start").addEventListener("click", function () {
+      var payload = {
+        job: { id: 0, title: "Practice role", company: "Practice Co", apply_url: window.location.origin + "/autofill-test.html?filled=1" },
+        applicant: {
+          first_name: "Test", last_name: "Person", full_name: "Test Person", email: "test.person@example.com",
+          phone: "+91 90000 00000", location: "Bengaluru, India", headline: "Practice",
+          linkedin_url: "https://www.linkedin.com/in/test-person", github_url: "https://github.com/test-person",
+          portfolio_url: null, website: "https://github.com/test-person",
+          college: "Practice College", degree: "B.Tech", discipline: "AI and ML", graduation_year: 2026,
+          authorized_countries: "India", requires_sponsorship: false, willing_to_relocate: true,
+          notice_period_days: 30, current_ctc_lpa: null, expected_ctc_lpa: 8,
+          cover_letter: "Hello Practice Co team, I am excited to apply for the Practice role.",
+          how_did_you_hear: "SwipeX", skills: []
+        },
+        resume: { id: 0, name: "Practice resume", filename: "Practice resume.pdf", mime: "application/pdf", data_base64: btoa("%PDF-1.1 practice resume") },
+        ready: true, missing: []
+      };
+      window.postMessage({ source: "swipex-web", type: "AUTOFILL", payload: payload }, window.location.origin);
+    });
+  </script>
+</body>
+</html>
