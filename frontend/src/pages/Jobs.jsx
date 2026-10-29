@@ -1,21 +1,19 @@
-import { useEffect, useState } from "react";
-import api, { errorMessage } from "../api";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import api, { errorMessage } from "../api";
 import CompanyLink from "./CompanyLink";
+import {
+  COMP_LABEL,
+  JOB_TYPE_LABEL,
+  LEVEL_LABEL,
+  TYPE_LABEL,
+  logoColor,
+  salary,
+  timeAgo,
+} from "../jobUtils";
 
-const TYPE_LABEL = { mnc: "MNC", startup: "Startup", new_startup: "New startup" };
-const JOB_TYPE_LABEL = { full_time: "Full-time", internship: "Internship" };
-const LEVEL_LABEL = { fresher: "Fresher", junior: "Junior", mid: "Mid-level", senior: "Senior" };
-const COMP_LABEL = { low: "Low competition", medium: "Medium competition", high: "High competition", unknown: "Competition unknown" };
 const PAGE_SIZE = 9;
-
-const GRADIENTS = [
-  "linear-gradient(135deg, #0a84ff, #5e5ce6)",
-  "linear-gradient(135deg, #ff375f, #ff9f0a)",
-  "linear-gradient(135deg, #30d158, #0a84ff)",
-  "linear-gradient(135deg, #bf5af2, #ff375f)",
-  "linear-gradient(135deg, #ff9f0a, #ffd60a)",
-];
+const REFRESH_MS = 60000;
 
 const EMPTY = {
   q: "",
@@ -43,26 +41,6 @@ const QUICK = [
   ["Internships", "job_type", "internship"],
 ];
 
-function logoColor(name) {
-  let h = 0;
-  for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 997;
-  return GRADIENTS[h % GRADIENTS.length];
-}
-
-function timeAgo(iso) {
-  const then = new Date(iso.endsWith("Z") ? iso : iso + "Z");
-  const hours = Math.floor((Date.now() - then.getTime()) / 3600000);
-  if (hours < 1) return "just now";
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return days === 1 ? "1 day ago" : `${days} days ago`;
-}
-
-function salary(job) {
-  if (job.salary_min_lpa == null || job.salary_max_lpa == null) return "Not disclosed";
-  return `${job.salary_min_lpa} - ${job.salary_max_lpa} LPA`;
-}
-
 function toParams(f, page) {
   const p = { page, page_size: PAGE_SIZE, sort: f.sort };
   if (f.q.trim()) p.q = f.q.trim();
@@ -77,13 +55,24 @@ function toParams(f, page) {
   return p;
 }
 
+function clock(date) {
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
 export default function Jobs() {
   const [filters, setFilters] = useState(EMPTY);
   const [page, setPage] = useState(1);
   const [showPanel, setShowPanel] = useState(false);
   const [data, setData] = useState({ items: [], total: 0 });
+  const [fresh, setFresh] = useState(null);
+  const [updatedAt, setUpdatedAt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const latest = useRef({ filters, page, data });
+
+  useEffect(() => {
+    latest.current = { filters, page, data };
+  });
 
   function update(patch) {
     setFilters((f) => ({ ...f, ...patch }));
@@ -104,6 +93,8 @@ export default function Jobs() {
         .then(({ data }) => {
           if (!cancelled) {
             setData(data);
+            setFresh(null);
+            setUpdatedAt(new Date());
             setError("");
           }
         })
@@ -120,6 +111,28 @@ export default function Jobs() {
     };
   }, [filters, page]);
 
+  // Every minute, quietly check for new jobs and offer a refresh banner.
+  useEffect(() => {
+    const timer = setInterval(async () => {
+      if (document.hidden) return;
+      const current = latest.current;
+      try {
+        const { data: next } = await api.get("/jobs", {
+          params: toParams(current.filters, current.page),
+        });
+        const ids = (list) => list.items.map((j) => j.id).join(",");
+        if (next.total !== current.data.total || ids(next) !== ids(current.data)) {
+          setFresh(next);
+        } else {
+          setUpdatedAt(new Date());
+        }
+      } catch {
+        // A failed background check is ignored. The next one tries again.
+      }
+    }, REFRESH_MS);
+    return () => clearInterval(timer);
+  }, []);
+
   const pages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
   const panelCount =
     [filters.location, filters.skill, filters.min_salary, filters.experience_level].filter(
@@ -133,7 +146,10 @@ export default function Jobs() {
       <div className="section-head">
         <div>
           <h2>Jobs</h2>
-          <p className="muted">{data.total} openings</p>
+          <p className="muted">
+            {data.total} openings
+            {updatedAt ? ` | Updated ${clock(updatedAt)}, checks every minute` : ""}
+          </p>
         </div>
       </div>
 
@@ -226,6 +242,19 @@ export default function Jobs() {
         </div>
       )}
 
+      {fresh && (
+        <button
+          className="update-banner"
+          onClick={() => {
+            setData(fresh);
+            setFresh(null);
+            setUpdatedAt(new Date());
+          }}
+        >
+          New jobs are available. Tap to show them
+        </button>
+      )}
+
       {error && <div className="msg error">{error}</div>}
       {loading && <p className="muted">Loading jobs...</p>}
 
@@ -249,7 +278,11 @@ export default function Jobs() {
                 {job.company.name.charAt(0)}
               </div>
               <div className="job-title">
-                <h3><Link className="title-link" to={"/jobs/" + job.id}>{job.title}</Link></h3>
+                <h3>
+                  <Link className="title-link" to={"/jobs/" + job.id}>
+                    {job.title}
+                  </Link>
+                </h3>
                 <CompanyLink company={job.company} />
               </div>
               <span className={`badge ${job.company.company_type}`}>
@@ -275,11 +308,15 @@ export default function Jobs() {
 
             <div className="row between foot muted small">
               <span>Posted {timeAgo(job.created_at)}</span>
-              <span>{job.source === "native" ? `${job.applicant_count} applicants` : "Official listing"}</span>
+              <span>
+                {job.source === "native" ? `${job.applicant_count} applicants` : "Official listing"}
+              </span>
             </div>
             <div className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</div>
 
-            <Link className="btn small details-link" to={"/jobs/" + job.id}>View details</Link>
+            <Link className="btn small details-link" to={"/jobs/" + job.id}>
+              View details
+            </Link>
           </article>
         ))}
       </div>

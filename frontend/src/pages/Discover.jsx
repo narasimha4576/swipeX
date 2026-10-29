@@ -148,6 +148,8 @@ export default function Discover() {
 
   useEffect(() => {
     fetchDeck(true);
+    const timer = setInterval(() => fetchDeck(false), 60000);
+    return () => clearInterval(timer);
   }, []);
 
   async function commit(direction) {

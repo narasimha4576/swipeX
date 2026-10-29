@@ -15,6 +15,7 @@ export default function AuthPage() {
   });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   if (user) return <Navigate to="/" replace />;
 
@@ -90,13 +91,35 @@ export default function AuthPage() {
 
           <label className="field">
             <span>Password</span>
-            <input
-              type="password"
-              value={form.password}
-              onChange={set("password")}
-              minLength={mode === "register" ? 8 : undefined}
-              required
-            />
+            <div className="password-wrap">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={set("password")}
+                minLength={mode === "register" ? 8 : undefined}
+                required
+              />
+              <button
+                type="button"
+                className="eye"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-6.5 0-10-8-10-8a18 18 0 0 1 4.1-5.2M9.9 4.2A9.7 9.7 0 0 1 12 4c6.5 0 10 8 10 8a18 18 0 0 1-2.2 3.3" />
+                    <path d="M14.1 14.1a3 3 0 1 1-4.2-4.2" />
+                    <path d="M2 2l20 20" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 12s3.5-8 10-8 10 8 10 8-3.5 8-10 8-10-8-10-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </label>
 
           {mode === "register" && (

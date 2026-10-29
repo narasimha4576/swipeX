@@ -4,6 +4,7 @@ import AuthPage from "./pages/AuthPage";
 import Discover from "./pages/Discover";
 import Jobs from "./pages/Jobs";
 import Applications from "./pages/Applications";
+import Picks from "./pages/Picks";
 import Profile from "./pages/Profile";
 import ResumeSection from "./pages/ResumeSection";
 import ExperienceSection from "./pages/ExperienceSection";
@@ -43,6 +44,11 @@ const ICONS = {
       <rect x="3" y="7" width="18" height="13" rx="2" />
       <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
       <path d="M3 13h18" />
+    </Icon>
+  ),
+  picks: (
+    <Icon>
+      <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
     </Icon>
   ),
   applications: (
@@ -99,6 +105,7 @@ const TABS = {
   job_seeker: [
     ["/discover", "Discover", "discover"],
     ["/jobs", "Jobs", "jobs"],
+    ["/picks", "Picks", "picks"],
     ["/applications", "Applications", "applications"],
     ["/profile", "Profile", "profile"],
   ],
@@ -160,6 +167,7 @@ function Shell() {
           {user.role === "job_seeker" && <Route path="/jobs/:id/apply" element={<ApplyReview />} />}
           {user.role === "job_seeker" && <Route path="/discover" element={<Discover />} />}
           {user.role === "job_seeker" && <Route path="/applications" element={<Applications />} />}
+          {user.role === "job_seeker" && <Route path="/picks" element={<Picks />} />}
           {user.role === "job_seeker" && <Route path="/profile" element={<ProfilePage />} />}
           {user.role === "recruiter" && <Route path="/workspace" element={<Workspace />} />}
           {user.role === "admin" && <Route path="/admin/users" element={<AdminUsers />} />}

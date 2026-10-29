@@ -434,3 +434,9 @@ class AutofillPayload(BaseModel):
     resume: AutofillResume | None = None
     ready: bool
     missing: list[str]
+
+
+class SkippedOut(BaseModel):
+    job: JobOut
+    skipped_at: datetime
+    days_left: int

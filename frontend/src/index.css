@@ -730,3 +730,11 @@ a.btn.primary { display: block; text-align: center; }
 .ext-status.on { border-color: var(--green); color: var(--green); }
 .ext-status.off { border-color: var(--amber); color: var(--amber); }
 .ext-status.checking { border-color: var(--line-strong); color: var(--muted); }
+
+.password-wrap { position: relative; }
+.password-wrap input { padding-right: 3rem; }
+.eye { position: absolute; right: 0.25rem; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; display: grid; place-items: center; padding: 0; color: var(--muted); background: none; border: none; cursor: pointer; }
+.eye:hover { color: var(--ink); }
+.eye svg { width: 20px; height: 20px; }
+.update-banner { width: 100%; margin: 0.8rem 0; padding: 0.7rem; font-family: var(--mono); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #161616; background: var(--orange); border: 1px solid var(--ink); cursor: pointer; animation: rise 0.3s ease backwards; }
+.update-banner:hover { background: var(--orange-dark); }

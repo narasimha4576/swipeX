@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -5,7 +7,8 @@ from sqlalchemy.orm import Session
 from app.deps import get_db, require_roles
 from app.models import Application, Company, Job, Swipe, User
 from app.routers.jobs import job_to_out
-from app.schemas import DeckOut, SwipeCreate, SwipeOut
+from app.maintenance import SKIP_RETENTION_DAYS
+from app.schemas import DeckOut, SkippedOut, SwipeCreate, SwipeOut
 
 router = APIRouter(prefix="/swipes", tags=["swipes"])
 
@@ -109,3 +112,32 @@ def undo_swipe(
     db.delete(existing)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/skipped", response_model=list[SkippedOut])
+def skipped_jobs(
+    db: Session = Depends(get_db),
+    user: User = Depends(require_roles("job_seeker")),
+):
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    rows = db.execute(
+        select(Swipe, Job, Company)
+        .join(Job, Swipe.job_id == Job.id)
+        .join(Company, Job.company_id == Company.id)
+        .where(
+            Swipe.user_id == user.id,
+            Swipe.direction == "left",
+            Job.is_active.is_(True),
+            Company.verification_status == "verified",
+        )
+        .order_by(Swipe.updated_at.desc())
+        .limit(200)
+    ).all()
+    return [
+        SkippedOut(
+            job=job_to_out(job, company),
+            skipped_at=swipe.updated_at,
+            days_left=max(0, SKIP_RETENTION_DAYS - (now - swipe.updated_at).days),
+        )
+        for swipe, job, company in rows
+    ]

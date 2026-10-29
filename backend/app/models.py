@@ -127,6 +127,9 @@ class Swipe(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"))
     direction: Mapped[str] = mapped_column(String(10))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now()
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
