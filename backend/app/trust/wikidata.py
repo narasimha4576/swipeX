@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 import httpx
 
 API = "https://www.wikidata.org/w/api.php"
@@ -80,6 +82,8 @@ def fetch_facts(qid: str, client: httpx.Client) -> dict:
     employees = _claim(entity, "P1128")
     hq = _claim(entity, "P159")
     website = _claim(entity, "P856")
+    logo = _claim(entity, "P154")
+    image = _claim(entity, "P18")
     wiki_title = (entity.get("sitelinks", {}).get("enwiki") or {}).get("title")
 
     founded_year = None
@@ -108,6 +112,8 @@ def fetch_facts(qid: str, client: httpx.Client) -> dict:
         "label": (entity.get("labels", {}).get("en") or {}).get("value"),
         "description": (entity.get("descriptions", {}).get("en") or {}).get("value"),
         "website": website if isinstance(website, str) else None,
+        "logo_url": commons_url(logo),
+        "image_url": commons_url(image),
         "founded_year": founded_year,
         "employees": employee_count,
         "headquarters": headquarters,
@@ -146,3 +152,13 @@ def search_companies(query: str, client: httpx.Client, limit: int = 6) -> list[d
         if len(found) >= limit:
             break
     return found
+
+
+def commons_url(filename) -> str | None:
+    if not isinstance(filename, str) or not filename.strip():
+        return None
+    return (
+        "https://commons.wikimedia.org/wiki/Special:FilePath/"
+        + quote(filename.strip().replace(" ", "_"))
+        + "?width=640"
+    )

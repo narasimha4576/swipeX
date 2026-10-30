@@ -89,7 +89,7 @@ export default function CompanyProfile({ kind }) {
 
       <section className="glass card">
         <div className="job-top">
-          <div className="logo">{data.name.charAt(0)}</div>
+          {facts.logo_url ? (<img className="company-logo" src={facts.logo_url} alt="" referrerPolicy="no-referrer" />) : (<div className="logo">{data.name.charAt(0)}</div>)}
           <div className="job-title">
             <h1 className="detail-title" style={{ margin: 0 }}>
               {data.name}
@@ -112,6 +112,7 @@ export default function CompanyProfile({ kind }) {
         </div>
 
         {data.description && <p className="muted" style={{ marginTop: "1rem" }}>{data.description}</p>}
+        {facts.image_url && <img className="company-photo" src={facts.image_url} alt={data.name} loading="lazy" referrerPolicy="no-referrer" />}
 
         {factItems.length > 0 && (
           <div className="facts" style={{ marginTop: "1rem" }}>
@@ -264,6 +265,8 @@ export default function CompanyProfile({ kind }) {
           </>
         )}
       </section>
+
+      <Link className="glass card web-cta" to={"/companies/web?name=" + encodeURIComponent(data.name)}><strong>More from the web</strong><div className="muted small">Photos, videos, web results and live job boards</div></Link>
 
       <OtherPortals query={data.name} location="" />
     </div>

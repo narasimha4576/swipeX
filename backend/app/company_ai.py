@@ -1,7 +1,6 @@
-import json
 import time
 
-from app.ai import complete
+from app.ai import AIUnavailable, complete, extract_json
 
 _cache: dict[str, tuple[float, dict]] = {}
 CACHE_SECONDS = 6 * 3600
@@ -32,9 +31,9 @@ def build_context(name: str, facts: dict, headlines: list[dict], job_titles: lis
     else:
         lines.append("No recent headlines were found.")
     if job_titles:
-        lines.append("Open roles on SwipeX: " + "; ".join(job_titles[:10]))
+        lines.append("Open roles: " + "; ".join(job_titles[:10]))
     else:
-        lines.append("No open roles on SwipeX right now.")
+        lines.append("No open roles were found.")
     return "\n".join(lines)
 
 
@@ -43,19 +42,17 @@ def summarize(cache_key: str, context: str) -> dict:
     if hit and time.time() - hit[0] < CACHE_SECONDS:
         return hit[1]
 
-    raw = complete(SYSTEM, context, json_mode=True, max_tokens=500)
+    raw = complete(SYSTEM, context, json_mode=True, max_tokens=1000)
     try:
-        data = json.loads(raw)
-    except json.JSONDecodeError:
-        data = {"about": raw[:600]}
-    if not isinstance(data, dict):
-        data = {"about": str(data)[:600]}
+        data = extract_json(raw) or {"about": raw[:600]}
+        cleaned = {
+            "about": str(data.get("about", ""))[:600],
+            "recent": [str(x)[:200] for x in (data.get("recent") or [])][:4],
+            "hiring": str(data.get("hiring", ""))[:400],
+            "check_before_applying": [str(x)[:200] for x in (data.get("check_before_applying") or [])][:3],
+        }
+    except Exception as exc:
+        raise AIUnavailable("The AI answered in a way SwipeX could not read. Try again.") from exc
 
-    cleaned = {
-        "about": str(data.get("about", ""))[:600],
-        "recent": [str(x)[:200] for x in (data.get("recent") or [])][:4],
-        "hiring": str(data.get("hiring", ""))[:400],
-        "check_before_applying": [str(x)[:200] for x in (data.get("check_before_applying") or [])][:3],
-    }
     _cache[cache_key] = (time.time(), cleaned)
     return cleaned

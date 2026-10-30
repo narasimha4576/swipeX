@@ -11,15 +11,17 @@
     fieldset label { display: inline-block; margin-right: 1rem; font-weight: 400; }
     fieldset input { width: auto; }
     .note { background: #fff3e8; border: 1px solid #ff6a1a; padding: 0.8rem; margin: 1rem 0; }
+    .check { font-weight: 400; display: flex; gap: 0.5rem; align-items: center; }
+    .check input { width: auto; }
     button { padding: 0.6rem 1rem; margin-top: 1rem; }
   </style>
 </head>
 <body>
   <h1>Autofill practice form</h1>
   <div class="note">
-    This is a harmless practice form. Nothing here is sent anywhere. Click the button to run a
-    test with made-up details.
+    This is a harmless practice form. Nothing here is sent anywhere. Click the button to run a test with made-up details.
   </div>
+  <label class="check"><input type="checkbox" id="useai" /> Also let AI answer the extra questions (log in to SwipeX in this browser first, and set up the AI)</label>
   <button id="start" type="button">Start autofill test</button>
   <p id="status">Checking for the extension...</p>
 
@@ -75,6 +77,21 @@
     <label for="gender">Gender (optional)</label>
     <select id="gender" name="gender"><option value="">Select...</option><option>Male</option><option>Female</option><option>Decline to self-identify</option></select>
 
+    <label for="project">Describe a project you are proud of</label>
+    <textarea id="project" name="project" rows="3"></textarea>
+
+    <label for="languages">Which programming languages are you strongest in?</label>
+    <input id="languages" name="languages" />
+
+    <label for="cloud">Do you have experience with cloud platforms?</label>
+    <select id="cloud" name="cloud"><option value="">Select...</option><option>Yes</option><option>A little</option><option>No</option></select>
+
+    <label for="refs">Please share the names of two professional references</label>
+    <input id="refs" name="refs" />
+
+    <label for="colour">What is your favourite colour?</label>
+    <input id="colour" name="colour" />
+
     <label for="why">Why do you want to work here? *</label>
     <textarea id="why" name="why" rows="3" required></textarea>
 
@@ -83,7 +100,11 @@
 
   <script>
     var ready = false;
+    var API = "http://127.0.0.1:8000";
     function status(text) { document.getElementById("status").textContent = text; }
+    function send(payload) {
+      window.postMessage({ source: "swipex-web", type: "AUTOFILL", payload: payload }, window.location.origin);
+    }
 
     window.addEventListener("message", function (event) {
       var data = event.data;
@@ -113,7 +134,15 @@
         resume: { id: 0, name: "Practice resume", filename: "Practice resume.pdf", mime: "application/pdf", data_base64: btoa("%PDF-1.1 practice resume") },
         ready: true, missing: []
       };
-      window.postMessage({ source: "swipex-web", type: "AUTOFILL", payload: payload }, window.location.origin);
+
+      if (!document.getElementById("useai").checked) { send(payload); return; }
+
+      var token = localStorage.getItem("swipex_token");
+      if (!token) { status("Log in to SwipeX in this browser first, then try again."); return; }
+      fetch(API + "/autofill/token", { method: "POST", headers: { Authorization: "Bearer " + token } })
+        .then(function (r) { if (!r.ok) throw new Error("token " + r.status); return r.json(); })
+        .then(function (d) { payload.ai = { token: d.token, api: API }; send(payload); })
+        .catch(function (e) { status("Could not get an AI token: " + e.message); });
     });
   </script>
 </body>

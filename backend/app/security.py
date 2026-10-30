@@ -25,9 +25,11 @@ def verify_password(password: str, hashed: str) -> bool:
     return password_hash.verify(password, hashed)
 
 
-def create_access_token(user_id: int, role: str) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+def create_access_token(user_id: int, role: str, minutes: int | None = None, scope: str | None = None) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(minutes=minutes or ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {"sub": str(user_id), "role": role, "exp": expire}
+    if scope:
+        payload["scope"] = scope
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 

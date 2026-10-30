@@ -197,6 +197,8 @@ def build_trust_card(db: Session, company: Company) -> TrustCardOut:
         website=web.get("url") or company.website,
         wikipedia_url=wiki.get("wikipedia_url"),
         wikidata_url=wiki.get("wikidata_url"),
+        logo_url=wiki.get("logo_url"),
+        image_url=wiki.get("image_url"),
         description=wiki.get("description"),
     )
     return TrustCardOut(

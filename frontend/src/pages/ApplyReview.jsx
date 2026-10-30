@@ -22,6 +22,7 @@ export default function ApplyReview() {
   const [extension, setExtension] = useState(null);
   const [stage, setStage] = useState("review");
   const [busy, setBusy] = useState(false);
+  const [useAi, setUseAi] = useState(false);
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
 
@@ -63,6 +64,10 @@ export default function ApplyReview() {
         params: { include_resume: true, ...(resumeId ? { resume_id: resumeId } : {}) },
       });
       data.applicant.cover_letter = coverLetter.trim() || null;
+      if (useAi) {
+        const issued = await api.post("/autofill/token");
+        data.ai = { token: issued.data.token, api: api.defaults.baseURL };
+      }
       const accepted = await sendAutofill(data);
       if (!accepted) {
         setExtension(false);
@@ -207,6 +212,21 @@ export default function ApplyReview() {
           maxLength={3000}
           placeholder="Optional. Leave empty to skip it."
         />
+
+        <label className="row" style={{ margin: "1rem 0 0" }}>
+          <input
+            type="checkbox"
+            style={{ width: 20, height: 20, accentColor: "var(--orange)" }}
+            checked={useAi}
+            onChange={(e) => setUseAi(e.target.checked)}
+          />
+          <span>Let AI answer the extra questions I have not saved answers for</span>
+        </label>
+        <p className="never">
+          Optional. Only the question and a few non-personal facts (skills, degree, years of
+          experience) go to the AI. It never answers legal, salary, ID or diversity questions, and it
+          leaves a field empty when it is not sure. Always check AI answers (purple outline).
+        </p>
 
         {extension === null && <div className="ext-status checking">Checking for the SwipeX Autofill extension...</div>}
         {extension === true && <div className="ext-status on">SwipeX Autofill extension detected.</div>}

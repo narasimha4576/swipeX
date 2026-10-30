@@ -124,6 +124,18 @@ export default function CompanySearch() {
         </>
       )}
 
+      {searching && (
+        <Link
+          className="glass card web-cta"
+          to={"/companies/web?name=" + encodeURIComponent(q.trim())}
+        >
+          <strong>Search the web for "{q.trim()}"</strong>
+          <div className="muted small">
+            Open jobs, photos, videos, news and web results for any company name
+          </div>
+        </Link>
+      )}
+
       {searching && loading && <p className="muted">Searching...</p>}
 
       {searching && results.companies.length > 0 && (

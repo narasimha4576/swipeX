@@ -307,6 +307,8 @@ class TrustFacts(BaseModel):
     website: str | None = None
     wikipedia_url: str | None = None
     wikidata_url: str | None = None
+    logo_url: str | None = None
+    image_url: str | None = None
     description: str | None = None
 
 
@@ -507,3 +509,40 @@ class SummaryOut(BaseModel):
     recent: list[str]
     hiring: str
     check_before_applying: list[str]
+
+
+class WebJob(BaseModel):
+    title: str
+    location: str | None = None
+    url: str
+    posted: str | None = None
+    job_type: str
+    source: str
+    board_url: str
+
+
+class WebResult(BaseModel):
+    title: str
+    url: str
+    snippet: str
+
+
+class VideoItem(BaseModel):
+    id: str
+    title: str
+    channel: str
+    thumbnail: str | None = None
+    published_at: str | None = None
+
+
+class WebOverview(BaseModel):
+    name: str
+    swipex_company_id: int | None = None
+    swipex_jobs: list[JobBrief]
+    live_jobs: list[WebJob]
+    news: list[NewsItem]
+    results: list[WebResult]
+    images: list[str]
+    videos: list[VideoItem]
+    videos_enabled: bool
+    ai_available: bool

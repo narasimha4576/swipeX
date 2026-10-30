@@ -28,6 +28,8 @@ def get_current_user(
     )
     try:
         payload = decode_access_token(token)
+        if payload.get("scope"):
+            raise credentials_error
         user_id = int(payload["sub"])
     except (jwt.InvalidTokenError, KeyError, ValueError):
         raise credentials_error
@@ -48,3 +50,20 @@ def require_roles(*roles: str):
         return current_user
 
     return checker
+
+
+def get_autofill_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+) -> User:
+    error = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    try:
+        payload = decode_access_token(token)
+        if payload.get("scope") != "autofill":
+            raise error
+        user_id = int(payload["sub"])
+    except (jwt.InvalidTokenError, KeyError, ValueError):
+        raise error
+    user = db.get(User, user_id)
+    if user is None or not user.is_active or user.role != "job_seeker":
+        raise error
+    return user

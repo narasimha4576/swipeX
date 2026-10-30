@@ -86,6 +86,8 @@ def facts_model(facts: dict) -> TrustFacts:
         website=facts.get("website"),
         wikipedia_url=facts.get("wikipedia_url"),
         wikidata_url=facts.get("wikidata_url"),
+        logo_url=facts.get("logo_url"),
+        image_url=facts.get("image_url"),
         description=facts.get("description"),
     )
 

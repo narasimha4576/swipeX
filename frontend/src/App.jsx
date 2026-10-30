@@ -15,9 +15,11 @@ import AdminCompanies from "./pages/AdminCompanies";
 import JobDetail from "./pages/JobDetail";
 import CompanySearch from "./pages/CompanySearch";
 import CompanyProfile from "./pages/CompanyProfile";
+import CompanyWeb from "./pages/CompanyWeb";
 import ApplyReview from "./pages/ApplyReview";
 import ApplicationDetailsSection from "./pages/ApplicationDetailsSection";
 import ThemeToggle from "./pages/ThemeToggle";
+import ChatBot from "./pages/ChatBot";
 
 function Icon({ children }) {
   return (
@@ -168,6 +170,7 @@ function Shell() {
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
           <Route path="/companies" element={<CompanySearch />} />
+          <Route path="/companies/web" element={<CompanyWeb />} />
           <Route path="/companies/public/:qid" element={<CompanyProfile kind="public" />} />
           <Route path="/companies/:id" element={<CompanyProfile kind="swipex" />} />
           {user.role === "job_seeker" && <Route path="/jobs/:id/apply" element={<ApplyReview />} />}
@@ -181,6 +184,8 @@ function Shell() {
           <Route path="*" element={<Navigate to={home} replace />} />
         </Routes>
       </main>
+
+      <ChatBot />
     </div>
   );
 }

@@ -95,7 +95,7 @@
     return null;
   }
 
-  const state = { filled: 0, resume: false, dismissed: false };
+  const state = { filled: 0, resume: false, dismissed: false, ai: 0, aiDone: false };
 
   function hasValue(value) {
     return value !== null && value !== undefined && value !== "";
@@ -274,6 +274,7 @@
     style.textContent =
       ".swipex-filled{outline:2px solid #ff6a1a !important;outline-offset:1px;}" +
       ".swipex-needs{outline:2px dashed #d13b2f !important;outline-offset:1px;}" +
+      ".swipex-ai{outline:2px solid #8e44ff !important;outline-offset:1px;}" +
       "#swipex-banner{position:fixed;z-index:2147483647;top:0;left:0;right:0;display:flex;gap:12px;" +
       "align-items:center;justify-content:space-between;padding:10px 14px;background:#161616;color:#fff;" +
       "font:13px/1.4 system-ui,sans-serif;border-bottom:3px solid #ff6a1a;}" +
@@ -303,6 +304,9 @@
         " required field" +
         (missing === 1 ? " still needs" : "s still need") +
         " your answer (red dashed outline). ";
+    }
+    if (state.ai > 0) {
+      message += "AI answered " + state.ai + " question" + (state.ai === 1 ? "" : "s") + " (purple outline). Please check " + (state.ai === 1 ? "it" : "them") + ". ";
     }
     message += "Check everything, then press Submit yourself.";
     const text = document.createElement("span");
@@ -410,6 +414,138 @@
     });
   }
 
+  function rawLabel(el) {
+    const parts = [];
+    if (el.id) {
+      document
+        .querySelectorAll('label[for="' + CSS.escape(el.id) + '"]')
+        .forEach((label) => parts.push(label.textContent));
+    }
+    const wrapper = el.closest("label");
+    if (wrapper) parts.push(wrapper.textContent);
+    const labelledBy = el.getAttribute("aria-labelledby");
+    if (labelledBy) {
+      labelledBy.split(/\s+/).forEach((id) => {
+        const node = document.getElementById(id);
+        if (node) parts.push(node.textContent);
+      });
+    }
+    parts.push(el.getAttribute("aria-label") || "", el.getAttribute("placeholder") || "");
+    const first = parts
+      .map((p) => (p || "").replace(/[*\u2731\u2217]/g, " ").replace(/\s+/g, " ").trim())
+      .find(Boolean);
+    return (first || "").slice(0, 300);
+  }
+
+  function rawGroup(radio) {
+    const box = radio.closest("fieldset, [role='radiogroup'], [role='group']");
+    if (!box) return "";
+    const legend = box.querySelector("legend");
+    let text = legend ? legend.textContent : "";
+    const labelledBy = box.getAttribute("aria-labelledby");
+    if (!text && labelledBy) {
+      text = labelledBy
+        .split(/\s+/)
+        .map((id) => (document.getElementById(id) ? document.getElementById(id).textContent : ""))
+        .join(" ");
+    }
+    if (!text) text = box.getAttribute("aria-label") || "";
+    return text.replace(/[*\u2731\u2217]/g, " ").replace(/\s+/g, " ").trim().slice(0, 300);
+  }
+
+  async function runAiPass(applicant) {
+    if (state.aiDone) return;
+    state.aiDone = true;
+
+    const questions = [];
+    const targets = {};
+    const seenRadios = new Set();
+    const LEGAL = /sponsor|relocat|authori[sz]ed|eligible|legally|work permit|visa/;
+    let count = 0;
+
+    for (const el of Array.from(document.querySelectorAll("input, textarea, select")).filter(usable)) {
+      if (questions.length >= 12) break;
+      const type = (el.type || "").toLowerCase();
+      if (["file", "checkbox", "submit", "button", "reset", "image", "password", "search", "hidden", "email", "tel"].includes(type)) continue;
+      if (el.getAttribute("role") === "combobox" || el.getAttribute("aria-haspopup") === "listbox") continue;
+      const names = describe(el);
+      if (SKIP_TOPICS.test(names.all) || LEGAL.test(names.all)) continue;
+
+      if (type === "radio") {
+        if (seenRadios.has(el.name)) continue;
+        seenRadios.add(el.name);
+        const group = Array.from(
+          document.querySelectorAll('input[type="radio"][name="' + CSS.escape(el.name) + '"]')
+        );
+        if (group.some((radio) => radio.checked)) continue;
+        const label = rawGroup(group[0]);
+        if (label.length < 4 || SKIP_TOPICS.test(label.toLowerCase()) || LEGAL.test(label.toLowerCase())) continue;
+        count += 1;
+        const id = "q" + count;
+        targets[id] = { kind: "radio", group: group };
+        questions.push({
+          id: id,
+          label: label,
+          kind: "radio",
+          options: group.map((radio) => rawLabel(radio)).filter(Boolean),
+          required: group.some((radio) => radio.required),
+        });
+        continue;
+      }
+
+      if (el.value) continue;
+      if (textValue(type, names.primary, names.all, applicant) !== undefined) continue;
+      const label = rawLabel(el);
+      if (label.length < 4) continue;
+
+      let kind = el.tagName === "TEXTAREA" ? "textarea" : "text";
+      let options = [];
+      if (el.tagName === "SELECT") {
+        kind = "select";
+        options = Array.from(el.options)
+          .map((o) => o.textContent.trim())
+          .filter((t) => t && !/^select/i.test(t));
+        if (options.length < 2) continue;
+      }
+      count += 1;
+      const id = "q" + count;
+      targets[id] = { kind: kind, el: el };
+      questions.push({ id: id, label: label, kind: kind, options: options, required: el.required });
+    }
+    if (questions.length === 0) return;
+
+    let response;
+    try {
+      response = await chrome.runtime.sendMessage({ type: "AI_ANSWER", questions: questions });
+    } catch (error) {
+      return;
+    }
+    if (!response || !response.ok) return;
+
+    for (const item of response.answers) {
+      const target = targets[item.id];
+      if (!target || !item.answer) continue;
+      let holder = null;
+      if (target.kind === "radio") {
+        const radio = target.group.find((r) => rawLabel(r).toLowerCase() === item.answer.toLowerCase());
+        if (radio && !target.group.some((r) => r.checked)) {
+          radio.click();
+          holder = target.group[0].closest("fieldset") || target.group[0];
+        }
+      } else if (target.kind === "select") {
+        if (!target.el.value && chooseOption(target.el, item.answer)) holder = target.el;
+      } else if (!target.el.value) {
+        setNative(target.el, item.answer);
+        holder = target.el;
+      }
+      if (holder) {
+        holder.classList.add("swipex-ai");
+        state.ai++;
+      }
+    }
+    showBanner(flagMissing());
+  }
+
   async function start() {
     let response = null;
     for (let attempt = 0; attempt < 3 && !(response && response.ok); attempt++) {
@@ -430,6 +566,7 @@
     runPass(applicant, resume);
     setTimeout(() => runPass(applicant, resume), 2500);
     setTimeout(() => runPass(applicant, resume), 6000);
+    setTimeout(() => runAiPass(applicant), 3500);
   }
 
   start();
