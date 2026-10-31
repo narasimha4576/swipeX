@@ -1,24 +1,28 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import api, { errorMessage } from "../api";
 import CompanyLink from "./CompanyLink";
+import JobDetail from "./JobDetail";
 import OtherPortals from "./OtherPortals";
 import {
   COMP_LABEL,
   JOB_TYPE_LABEL,
   LEVEL_LABEL,
   TYPE_LABEL,
+  isThirdParty,
   logoColor,
   salary,
+  sourceBadge,
   timeAgo,
 } from "../jobUtils";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 12;
 const REFRESH_MS = 60000;
 
 const EMPTY = {
   q: "",
-  verified_only: true,
+  verified_only: false,
+  country: "",
   company_type: "",
   job_type: "",
   experience_level: "",
@@ -45,12 +49,12 @@ const QUICK = [
 ];
 
 function toParams(f, page) {
-  const p = { page, page_size: PAGE_SIZE, sort: f.sort };
+  const p = { page, page_size: PAGE_SIZE, sort: f.sort, verified_only: f.verified_only };
   if (f.q.trim()) p.q = f.q.trim();
+  if (f.country) p.country = f.country;
   ["company_type", "job_type", "experience_level", "location", "skill"].forEach((k) => {
     if (typeof f[k] === "string" && f[k].trim()) p[k] = f[k].trim();
   });
-  if (!f.verified_only) p.verified_only = false;
   if (f.remote) p.remote = true;
   if (f.fresher_friendly) p.fresher_friendly = true;
   if (f.low_competition) p.low_competition = true;
@@ -63,12 +67,28 @@ function clock(date) {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+function useWide() {
+  const query = "(min-width: 1100px)";
+  const [wide, setWide] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    const onChange = () => setWide(media.matches);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
+  return wide;
+}
+
 export default function Jobs() {
-  const [filters, setFilters] = useState(EMPTY);
+  const [searchParams] = useSearchParams();
+  const wide = useWide();
+  const [filters, setFilters] = useState(() => ({ ...EMPTY, q: searchParams.get("q") || "" }));
   const [page, setPage] = useState(1);
   const [showPanel, setShowPanel] = useState(false);
   const [data, setData] = useState({ items: [], total: 0 });
   const [fresh, setFresh] = useState(null);
+  const [countries, setCountries] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
   const [updatedAt, setUpdatedAt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -87,6 +107,13 @@ export default function Jobs() {
     setFilters(EMPTY);
     setPage(1);
   }
+
+  useEffect(() => {
+    api
+      .get("/job-countries")
+      .then(({ data }) => setCountries(data))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,7 +142,6 @@ export default function Jobs() {
     };
   }, [filters, page]);
 
-  // Every minute, quietly check for new jobs and offer a refresh banner.
   useEffect(() => {
     const timer = setInterval(async () => {
       if (document.hidden) return;
@@ -137,6 +163,11 @@ export default function Jobs() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    if (!wide || data.items.length === 0) return;
+    if (!data.items.some((job) => job.id === selectedId)) setSelectedId(data.items[0].id);
+  }, [wide, data, selectedId]);
+
   const pages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
   const panelCount =
     [filters.location, filters.skill, filters.min_salary, filters.experience_level].filter(
@@ -145,13 +176,102 @@ export default function Jobs() {
   const anyFilter =
     JSON.stringify({ ...filters, sort: "newest" }) !== JSON.stringify({ ...EMPTY });
 
+  const list = (
+    <>
+      <div className="jobs-grid">
+        {data.items.map((job) => (
+          <article
+            className={"glass job-card" + (wide && job.id === selectedId ? " active" : "")}
+            key={job.id}
+            onClick={() => wide && setSelectedId(job.id)}
+          >
+            <div className="job-top">
+              <div className="logo" style={{ background: logoColor(job.company.name) }}>
+                {job.company.name.charAt(0)}
+              </div>
+              <div className="job-title">
+                <h3>
+                  <Link
+                    className="title-link"
+                    to={"/jobs/" + job.id}
+                    onClick={(e) => {
+                      if (wide) e.preventDefault();
+                    }}
+                  >
+                    {job.title}
+                  </Link>
+                </h3>
+                <CompanyLink company={job.company} />
+              </div>
+              <span className={`badge ${job.company.company_type}`}>
+                {TYPE_LABEL[job.company.company_type] ?? job.company.company_type}
+              </span>
+            </div>
+
+            <div className="meta">
+              <span>{job.is_remote ? "Remote" : job.location || "Location not listed"}</span>
+              <span>{JOB_TYPE_LABEL[job.job_type] ?? job.job_type}</span>
+              <span>{LEVEL_LABEL[job.experience_level] ?? job.experience_level}</span>
+            </div>
+
+            {job.company.verification_status !== "verified" && (
+              <div className="warn-note">
+                {isThirdParty(job.source)
+                  ? "Third-party listing. Not checked by SwipeX."
+                  : "Unverified company. Check the safety details before applying."}
+              </div>
+            )}
+
+            <div className="salary">{salary(job)}</div>
+
+            <div className="chips">
+              {job.skills.slice(0, 5).map((s) => (
+                <span className="chip" key={s}>
+                  {s}
+                </span>
+              ))}
+            </div>
+
+            <div className="row between foot muted small">
+              <span>Posted {timeAgo(job.created_at)}</span>
+              <span>
+                {job.source === "native" ? `${job.applicant_count} applicants` : sourceBadge(job.source)}
+              </span>
+            </div>
+            <div className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</div>
+
+            {!wide && (
+              <Link className="btn small details-link" to={"/jobs/" + job.id}>
+                View details
+              </Link>
+            )}
+          </article>
+        ))}
+      </div>
+
+      {data.total > 0 && (
+        <div className="pager">
+          <button className="btn small" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+            Previous
+          </button>
+          <span className="muted small">
+            Page {page} of {pages}
+          </span>
+          <button className="btn small" disabled={page >= pages} onClick={() => setPage(page + 1)}>
+            Next
+          </button>
+        </div>
+      )}
+    </>
+  );
+
   return (
     <section>
       <div className="section-head">
         <div>
           <h2>Jobs</h2>
           <p className="muted">
-            {data.total} openings
+            {data.total.toLocaleString("en-IN")} openings
             {updatedAt ? ` | Updated ${clock(updatedAt)}, checks every minute` : ""}
           </p>
         </div>
@@ -169,6 +289,17 @@ export default function Jobs() {
         />
       </div>
 
+      <div className="country-row">
+        <select value={filters.country} onChange={(e) => update({ country: e.target.value })}>
+          <option value="">All countries (worldwide)</option>
+          {countries.map((c) => (
+            <option key={c.country} value={c.country}>
+              {c.country} ({c.count})
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="filter-bar">
         <button
           className={showPanel ? "fchip on" : "fchip"}
@@ -176,7 +307,12 @@ export default function Jobs() {
         >
           Filters{panelCount > 0 ? ` (${panelCount})` : ""}
         </button>
-        <button className={filters.verified_only ? "fchip on" : "fchip"} onClick={() => update({ verified_only: !filters.verified_only })}>Verified only</button>
+        <button
+          className={filters.verified_only ? "fchip on" : "fchip"}
+          onClick={() => update({ verified_only: !filters.verified_only })}
+        >
+          Verified only
+        </button>
         {QUICK.map(([label, key, value]) => (
           <button
             key={label}
@@ -192,11 +328,11 @@ export default function Jobs() {
         <div className="glass card panel">
           <div className="grid2">
             <label className="field">
-              <span>Location</span>
+              <span>City or place</span>
               <input
                 value={filters.location}
                 onChange={(e) => update({ location: e.target.value })}
-                placeholder="e.g. Bengaluru"
+                placeholder="e.g. Berlin"
               />
             </label>
             <label className="field">
@@ -210,7 +346,7 @@ export default function Jobs() {
           </div>
           <div className="grid2">
             <label className="field">
-              <span>Minimum salary (LPA)</span>
+              <span>Minimum salary (LPA, SwipeX jobs only)</span>
               <input
                 type="number"
                 min="0"
@@ -275,73 +411,18 @@ export default function Jobs() {
         </div>
       )}
 
-      <div className="jobs-grid">
-        {data.items.map((job) => (
-          <article className="glass job-card" key={job.id}>
-            <div className="job-top">
-              <div className="logo" style={{ background: logoColor(job.company.name) }}>
-                {job.company.name.charAt(0)}
-              </div>
-              <div className="job-title">
-                <h3>
-                  <Link className="title-link" to={"/jobs/" + job.id}>
-                    {job.title}
-                  </Link>
-                </h3>
-                <CompanyLink company={job.company} />
-              </div>
-              <span className={`badge ${job.company.company_type}`}>
-                {TYPE_LABEL[job.company.company_type] ?? job.company.company_type}
-              </span>
-            </div>
-
-            <div className="meta">
-              <span>{job.is_remote ? "Remote" : job.location}</span>
-              <span>{JOB_TYPE_LABEL[job.job_type] ?? job.job_type}</span>
-              <span>{LEVEL_LABEL[job.experience_level] ?? job.experience_level}</span>
-            </div>
-
-            {job.company.verification_status !== "verified" && (<div className="warn-note">Unverified company. Check the safety details before applying.</div>)}
-            <div className="salary">{salary(job)}</div>
-
-            <div className="chips">
-              {job.skills.slice(0, 5).map((s) => (
-                <span className="chip" key={s}>
-                  {s}
-                </span>
-              ))}
-            </div>
-
-            <div className="row between foot muted small">
-              <span>Posted {timeAgo(job.created_at)}</span>
-              <span>
-                {job.source === "native" ? `${job.applicant_count} applicants` : job.source === "adzuna" ? "Aggregated listing" : "Official listing"}
-              </span>
-            </div>
-            <div className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</div>
-
-            <Link className="btn small details-link" to={"/jobs/" + job.id}>
-              View details
-            </Link>
-          </article>
-        ))}
-      </div>
+      {wide && data.items.length > 0 ? (
+        <div className="split">
+          <div className="split-list">{list}</div>
+          <div className="split-detail">
+            {selectedId && <JobDetail key={selectedId} jobId={selectedId} embedded />}
+          </div>
+        </div>
+      ) : (
+        list
+      )}
 
       <OtherPortals query={filters.q} location={filters.location} />
-
-      {data.total > 0 && (
-        <div className="pager">
-          <button className="btn small" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-            Previous
-          </button>
-          <span className="muted small">
-            Page {page} of {pages}
-          </span>
-          <button className="btn small" disabled={page >= pages} onClick={() => setPage(page + 1)}>
-            Next
-          </button>
-        </div>
-      )}
     </section>
   );
 }

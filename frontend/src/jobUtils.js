@@ -41,3 +41,21 @@ export function salary(job) {
   if (job.salary_min_lpa == null || job.salary_max_lpa == null) return "Not disclosed";
   return `${job.salary_min_lpa} - ${job.salary_max_lpa} LPA`;
 }
+
+export const SOURCE_LABEL = {
+  greenhouse: "Greenhouse",
+  lever: "Lever",
+  ashby: "Ashby",
+  adzuna: "Adzuna",
+  remoteok: "RemoteOK",
+  arbeitnow: "Arbeitnow",
+};
+export const THIRD_PARTY = ["adzuna", "remoteok", "arbeitnow"];
+
+export function isThirdParty(source) {
+  return THIRD_PARTY.includes(source);
+}
+
+export function sourceBadge(source) {
+  return isThirdParty(source) ? "Third-party: " + (SOURCE_LABEL[source] || source) : "Official listing";
+}

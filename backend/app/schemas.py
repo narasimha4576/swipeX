@@ -546,3 +546,8 @@ class WebOverview(BaseModel):
     videos: list[VideoItem]
     videos_enabled: bool
     ai_available: bool
+
+
+class CountryCount(BaseModel):
+    country: str
+    count: int

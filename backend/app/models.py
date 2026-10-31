@@ -103,6 +103,7 @@ class Job(Base):
     external_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     apply_url: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     last_seen_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    country: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 

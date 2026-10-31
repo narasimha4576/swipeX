@@ -2,6 +2,7 @@
 (() => {
   if (window.__swipexAutofillLoaded) return;
   window.__swipexAutofillLoaded = true;
+  const SHOW_BANNER = false;
 
   const SKIP_TOPICS =
     /(gender|\brace\b|ethnic|veteran|disabilit|pronoun|sexual orientation|hispanic|latino|transgender|demographic|self[- ]identif)/;
@@ -283,7 +284,7 @@
   }
 
   function showBanner(missing) {
-    if (state.dismissed) return;
+    if (state.dismissed || !SHOW_BANNER) return;
     let box = document.getElementById("swipex-banner");
     if (!box) {
       box = document.createElement("div");

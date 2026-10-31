@@ -100,5 +100,119 @@
     "token": "harvey",
     "name": "harvey",
     "company_type": "mnc"
+  },
+  {
+    "source": "greenhouse",
+    "token": "anthropic",
+    "name": "Anthropic",
+    "company_type": "mnc"
+  },
+  {
+    "source": "greenhouse",
+    "token": "airtable",
+    "name": "Airtable",
+    "company_type": "startup"
+  },
+  {
+    "source": "greenhouse",
+    "token": "brex",
+    "name": "Brex",
+    "company_type": "mnc"
+  },
+  {
+    "source": "greenhouse",
+    "token": "carta",
+    "name": "Carta",
+    "company_type": "startup"
+  },
+  {
+    "source": "greenhouse",
+    "token": "chime",
+    "name": "Chime Financial, Inc",
+    "company_type": "startup"
+  },
+  {
+    "source": "greenhouse",
+    "token": "coursera",
+    "name": "Coursera",
+    "company_type": "startup"
+  },
+  {
+    "source": "greenhouse",
+    "token": "gusto",
+    "name": "Gusto, Inc.",
+    "company_type": "startup"
+  },
+  {
+    "source": "greenhouse",
+    "token": "scaleai",
+    "name": "Scale AI",
+    "company_type": "mnc"
+  },
+  {
+    "source": "greenhouse",
+    "token": "squarespace",
+    "name": "Squarespace",
+    "company_type": "startup"
+  },
+  {
+    "source": "greenhouse",
+    "token": "udemy",
+    "name": "Udemy",
+    "company_type": "startup"
+  },
+  {
+    "source": "greenhouse",
+    "token": "zoominfo",
+    "name": "ZoomInfo Technologies LLC",
+    "company_type": "startup"
+  },
+  {
+    "source": "greenhouse",
+    "token": "samsara",
+    "name": "Samsara",
+    "company_type": "mnc"
+  },
+  {
+    "source": "greenhouse",
+    "token": "affirm",
+    "name": "Affirm",
+    "company_type": "mnc"
+  },
+  {
+    "source": "greenhouse",
+    "token": "mixpanel",
+    "name": "Mixpanel",
+    "company_type": "startup"
+  },
+  {
+    "source": "greenhouse",
+    "token": "fivetran",
+    "name": "Fivetran",
+    "company_type": "mnc"
+  },
+  {
+    "source": "lever",
+    "token": "palantir",
+    "name": "palantir",
+    "company_type": "mnc"
+  },
+  {
+    "source": "lever",
+    "token": "spotify",
+    "name": "spotify",
+    "company_type": "startup"
+  },
+  {
+    "source": "ashby",
+    "token": "modal",
+    "name": "modal",
+    "company_type": "startup"
+  },
+  {
+    "source": "ashby",
+    "token": "pinecone",
+    "name": "pinecone",
+    "company_type": "startup"
   }
 ]

@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import httpx
 
 from app.importers.greenhouse import clean_html, infer_level, is_relevant, job_type_for
+from app.geo import detect_country
 from app.skills import extract_skills
 
 SOURCE = "lever"
@@ -66,6 +67,7 @@ def to_job_fields(raw: dict) -> dict | None:
         "title": title[:200],
         "description": description,
         "location": (location or location_text)[:120] or None,
+        "country": detect_country(location_text),
         "is_remote": raw.get("workplaceType") == "remote"
         or any(w in location_text.lower() for w in ("remote", "anywhere", "worldwide")),
         "job_type": job_type_for(text),

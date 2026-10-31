@@ -2,12 +2,12 @@ from datetime import datetime, timedelta, timezone
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import Text, cast, func, or_, select
+from sqlalchemy import Text, and_, cast, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.deps import get_current_user, get_db
-from app.models import Company, Job, User
-from app.schemas import CompanyOut, JobOut, JobPage, SafetyFlag, SafetyOut
+from app.models import Company, Job, Profile, User
+from app.schemas import CompanyOut, CountryCount, JobOut, JobPage, SafetyFlag, SafetyOut
 from app.safety import analyze
 
 router = APIRouter(tags=["jobs"])
@@ -61,6 +61,7 @@ def list_jobs(
     min_salary: float | None = Query(None, ge=0),
     max_age_days: int | None = Query(None, ge=1, le=365),
     verified_only: bool = True,
+    country: str | None = None,
     fresher_friendly: bool = False,
     low_competition: bool = False,
     sort: Literal["newest", "salary", "competition"] = "newest",
@@ -92,6 +93,13 @@ def list_jobs(
         conditions.append(Job.experience_level == experience_level)
     if remote is not None:
         conditions.append(Job.is_remote.is_(remote))
+    if country and country.strip():
+        conditions.append(
+            or_(
+                Job.country == country.strip(),
+                and_(Job.is_remote.is_(True), Job.country.is_(None)),
+            )
+        )
     if location and location.strip():
         conditions.append(Job.location.ilike(f"%{location.strip()}%"))
     if skill and skill.strip():
@@ -190,3 +198,47 @@ def job_safety(
         flags=[SafetyFlag(severity=f.severity, text=f.text) for f in result.flags],
         good=result.good,
     )
+
+
+@router.get("/job-countries", response_model=list[CountryCount])
+def job_countries(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    rows = db.execute(
+        select(Job.country, func.count(Job.id))
+        .join(Company, Job.company_id == Company.id)
+        .where(
+            Job.is_active.is_(True),
+            Job.country.is_not(None),
+            Company.verification_status != "rejected",
+        )
+        .group_by(Job.country)
+        .order_by(func.count(Job.id).desc())
+        .limit(80)
+    ).all()
+    return [CountryCount(country=name, count=total) for name, total in rows]
+
+
+@router.get("/jobs-for-you", response_model=list[JobOut])
+def jobs_for_you(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    profile = db.scalar(select(Profile).where(Profile.user_id == user.id))
+    mine = {s.lower() for s in (profile.skills or [])} if profile else set()
+    rows = db.execute(
+        select(Job, Company)
+        .join(Company, Job.company_id == Company.id)
+        .where(Job.is_active.is_(True), Company.verification_status != "rejected")
+        .order_by(Job.created_at.desc())
+        .limit(500)
+    ).all()
+
+    scored = []
+    for job, company in rows:
+        overlap = len(mine & {s.lower() for s in (job.skills or [])})
+        verified = 1 if company.verification_status == "verified" else 0
+        scored.append((overlap, verified, job.created_at, job, company))
+    scored.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
+    return [job_to_out(job, company) for _, _, _, job, company in scored[:12]]

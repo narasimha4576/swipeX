@@ -1,12 +1,15 @@
 import html
+import os
 import re
 from datetime import datetime, timezone
 
 import httpx
 
+from app.geo import detect_country
 from app.skills import extract_skills
 
 API = "https://boards-api.greenhouse.io/v1/boards"
+IMPORT_EVERYTHING = os.getenv("IMPORT_ALL_JOBS", "true").lower() == "true"
 HEADERS = {"User-Agent": "SwipeX-portfolio-project/1.0"}
 
 # Only jobs whose location contains one of these words are imported.
@@ -51,6 +54,8 @@ def fetch_jobs(token: str, client: httpx.Client, with_content: bool = True) -> l
 
 def is_relevant(title: str, location: str) -> bool:
     location = location.lower()
+    if IMPORT_EVERYTHING:
+        return True
     return any(k in location for k in LOCATION_KEYWORDS) and bool(ROLE_RE.search(title))
 
 
@@ -100,6 +105,7 @@ def to_job_fields(raw: dict) -> dict | None:
         "title": title[:200],
         "description": description,
         "location": location[:120] or None,
+        "country": detect_country(location),
         "is_remote": any(w in location.lower() for w in ("remote", "anywhere", "worldwide")),
         "job_type": job_type_for(title),
         "experience_level": infer_level(title),

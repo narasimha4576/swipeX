@@ -5,6 +5,7 @@ import api, { errorMessage } from "../api";
 import CompanyLink from "./CompanyLink";
 import {
   COMP_LABEL,
+  sourceBadge,
   JOB_TYPE_LABEL,
   LEVEL_LABEL,
   TYPE_LABEL,
@@ -103,7 +104,7 @@ function SwipeCard({ job, position, exitX, onSwipe }) {
 
       <div className="row between foot muted small">
         <span>Posted {timeAgo(job.created_at)}</span>
-        <span>{job.source === "native" ? `${job.applicant_count} applicants` : job.source === "adzuna" ? "Aggregated listing" : "Official listing"}</span>
+        <span>{job.source === "native" ? `${job.applicant_count} applicants` : sourceBadge(job.source)}</span>
       </div>
     </motion.div>
   );

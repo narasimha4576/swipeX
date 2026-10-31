@@ -7,12 +7,12 @@ import httpx
 from sqlalchemy import func, select
 
 from app.database import SessionLocal
-from app.importers import adzuna, ashby, greenhouse, lever
+from app.importers import adzuna, ashby, greenhouse, lever, thirdparty
 from app.models import Company, Job
 
 SOURCES = {module.SOURCE: module for module in (greenhouse, lever, ashby)}
 BOARDS_FILE = Path(__file__).with_name("boards.json")
-MAX_JOBS_PER_COMPANY = 40
+MAX_JOBS_PER_COMPANY = 300
 
 
 def load_boards() -> list[dict]:
@@ -137,6 +137,14 @@ def sync_all() -> dict:
                 totals["failed"] += 1
                 print(f"  Import failed for {board.get('source')}:{board.get('token')}: {exc}", flush=True)
             time.sleep(1)
+
+        try:
+            result = thirdparty.sync(client)
+            for key in ("created", "updated", "closed"):
+                totals[key] += result[key]
+        except Exception as exc:
+            totals["failed"] += 1
+            print(f"  Third-party import failed: {exc}", flush=True)
 
         if adzuna.enabled():
             try:

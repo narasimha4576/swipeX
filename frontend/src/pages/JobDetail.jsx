@@ -6,6 +6,8 @@ import CompanyLink from "./CompanyLink";
 import SafetyCard from "./SafetyCard";
 import {
   COMP_LABEL,
+  isThirdParty,
+  sourceBadge,
   JOB_TYPE_LABEL,
   LEVEL_LABEL,
   TYPE_LABEL,
@@ -21,8 +23,9 @@ const STATUS_LABEL = {
   rejected: "Rejected",
 };
 
-export default function JobDetail() {
-  const { id } = useParams();
+export default function JobDetail({ jobId, embedded = false }) {
+  const params = useParams();
+  const id = jobId ?? params.id;
   const navigate = useNavigate();
   const { user } = useAuth();
   const isSeeker = user.role === "job_seeker";
@@ -133,7 +136,7 @@ export default function JobDetail() {
 
   if (!job) {
     return (
-      <div className="detail-page">
+      <div className={"detail-page" + (embedded ? " embedded-detail" : "")}>
         <button className="btn small" style={{ alignSelf: "flex-start" }} onClick={goBack}>
           Back
         </button>
@@ -147,7 +150,7 @@ export default function JobDetail() {
   const applied = Boolean(status) && status !== "saved";
 
   return (
-    <div className="detail-page">
+    <div className={"detail-page" + (embedded ? " embedded-detail" : "")}>
       <button className="btn small" style={{ alignSelf: "flex-start" }} onClick={goBack}>
         Back
       </button>
@@ -162,7 +165,7 @@ export default function JobDetail() {
                 <span className={`badge ${job.company.company_type}`}>
                   {TYPE_LABEL[job.company.company_type] ?? job.company.company_type}
                 </span>
-                {official && <span className="badge mnc">{job.source === "adzuna" ? "Aggregated listing" : "Official listing"}</span>}
+                {official && <span className="badge mnc">{sourceBadge(job.source)}</span>}
               </div>
             </div>
           </div>
@@ -194,6 +197,8 @@ export default function JobDetail() {
             </span>
             <span className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</span>
           </div>
+
+          {isThirdParty(job.source) && (<div className="warn-note" style={{ marginTop: "1rem" }}>Third-party listing. SwipeX has not checked this company or posting. Apply at your own risk.</div>)}
 
           <SafetyCard jobId={job.id} />
 

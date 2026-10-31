@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from "./auth";
 import AuthPage from "./pages/AuthPage";
 import Discover from "./pages/Discover";
 import Jobs from "./pages/Jobs";
+import Home from "./pages/Home";
 import Applications from "./pages/Applications";
 import Picks from "./pages/Picks";
 import Profile from "./pages/Profile";
@@ -37,6 +38,12 @@ function Icon({ children }) {
 }
 
 const ICONS = {
+  home: (
+    <Icon>
+      <path d="M3 11l9-8 9 8" />
+      <path d="M5 10v10h14V10" />
+    </Icon>
+  ),
   discover: (
     <Icon>
       <rect x="4" y="3" width="16" height="18" rx="2" />
@@ -107,9 +114,10 @@ function ProfilePage() {
 
 const TABS = {
   job_seeker: [
+    ["/home", "Home", "home"],
     ["/discover", "Discover", "discover"],
     ["/jobs", "Jobs", "jobs"],
-    ["/companies", "Companies", "companies"],
+    
     ["/picks", "Picks", "picks"],
     ["/applications", "Applications", "applications"],
     ["/profile", "Profile", "profile"],
@@ -174,6 +182,7 @@ function Shell() {
           <Route path="/companies/public/:qid" element={<CompanyProfile kind="public" />} />
           <Route path="/companies/:id" element={<CompanyProfile kind="swipex" />} />
           {user.role === "job_seeker" && <Route path="/jobs/:id/apply" element={<ApplyReview />} />}
+          {user.role === "job_seeker" && <Route path="/home" element={<Home />} />}
           {user.role === "job_seeker" && <Route path="/discover" element={<Discover />} />}
           {user.role === "job_seeker" && <Route path="/applications" element={<Applications />} />}
           {user.role === "job_seeker" && <Route path="/picks" element={<Picks />} />}
