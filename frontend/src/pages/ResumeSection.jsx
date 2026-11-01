@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import api, { errorMessage } from "../api";
+import ResumeAnalysisPanel from "./ResumeAnalysisPanel";
 
 export default function ResumeSection() {
   const [resumes, setResumes] = useState([]);
@@ -9,6 +10,7 @@ export default function ResumeSection() {
   const [ok, setOk] = useState("");
   const [busy, setBusy] = useState(false);
   const fileInput = useRef(null);
+  const [analyzeId, setAnalyzeId] = useState(null);
 
   async function load() {
     try {
@@ -119,6 +121,8 @@ export default function ResumeSection() {
         </button>
       </form>
 
+      {analyzeId && <ResumeAnalysisPanel key={analyzeId} resumeId={analyzeId} onClose={() => setAnalyzeId(null)} />}
+
       {resumes.length === 0 && <p className="muted">No resumes yet.</p>}
 
       {resumes.map((r) => (
@@ -131,6 +135,7 @@ export default function ResumeSection() {
             </div>
           </div>
           <div className="actions">
+            <button className="btn small" onClick={() => setAnalyzeId(analyzeId === r.id ? null : r.id)}>Analyze</button>
             <button className="btn small" onClick={() => view(r.id)}>
               View
             </button>

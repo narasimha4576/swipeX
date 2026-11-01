@@ -8,7 +8,7 @@ export default function CompanyLink({ company }) {
     <>
       <button
         type="button"
-        className="company-link"
+        className={"company-link" + (company.verification_status === "verified" ? "" : " unverified")}
         onPointerDownCapture={(e) => e.stopPropagation()}
         onClick={() => setOpen(true)}
       >

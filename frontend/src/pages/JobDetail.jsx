@@ -4,6 +4,7 @@ import api, { errorMessage } from "../api";
 import { useAuth } from "../auth";
 import CompanyLink from "./CompanyLink";
 import SafetyCard from "./SafetyCard";
+import MatchCard from "./MatchCard";
 import {
   COMP_LABEL,
   isThirdParty,
@@ -207,6 +208,8 @@ export default function JobDetail({ jobId, embedded = false }) {
         </article>
 
         <aside className="glass card detail-side">
+          {isSeeker && <MatchCard jobId={job.id} />}
+
           <h3>Apply</h3>
           {error && <div className="msg error">{error}</div>}
           {ok && <div className="msg ok">{ok}</div>}

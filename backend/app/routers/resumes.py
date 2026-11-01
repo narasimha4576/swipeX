@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.deps import get_db, require_roles
 from app.models import Application, Resume, User
+from app.resume_tools import read_pdf
 from app.schemas import ResumeOut
 
 router = APIRouter(prefix="/resumes", tags=["resumes"])
@@ -75,12 +76,13 @@ def upload_resume(
 
     filename = f"{uuid.uuid4().hex}.pdf"
     (UPLOAD_DIR / filename).write_bytes(content)
+    parsed_text, _pages = read_pdf(UPLOAD_DIR / filename)
 
     resume = Resume(
         user_id=user.id,
         version_name=name,
         file_path=filename,
-        parsed_text=None,
+        parsed_text=parsed_text or None,
         is_default=(count == 0),
     )
     db.add(resume)
