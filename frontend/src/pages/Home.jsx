@@ -21,7 +21,7 @@ function MiniJob({ job }) {
           {job.is_remote ? "Remote" : job.location || "Location not listed"}
         </div>
         <div className="muted small">
-          {JOB_TYPE_LABEL[job.job_type] ?? job.job_type} | {sourceBadge(job.source)} | {timeAgo(job.created_at)}
+          {job.match != null ? job.match + "% skills match | " : ""}{JOB_TYPE_LABEL[job.job_type] ?? job.job_type} | {sourceBadge(job.source)} | {timeAgo(job.created_at)}
         </div>
       </div>
     </div>
@@ -180,7 +180,7 @@ export default function Home() {
         ) : (
           <section className="glass card">
             <h2>Jobs for you</h2>
-            <p className="muted small">Ranked by how well they match your skills, then by newest.</p>
+            <p className="muted small">Ranked by how well they match the skills in your profile and default resume.</p>
             {forYou.length === 0 && <p className="muted">Jobs will appear here as soon as they are imported.</p>}
             {forYou.map((job) => (
               <MiniJob key={job.id} job={job} />

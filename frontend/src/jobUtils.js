@@ -59,3 +59,9 @@ export function isThirdParty(source) {
 export function sourceBadge(source) {
   return isThirdParty(source) ? "Third-party: " + (SOURCE_LABEL[source] || source) : "Official listing";
 }
+
+export function matchClass(n) {
+  if (n >= 75) return "strong";
+  if (n >= 50) return "good";
+  return "low";
+}

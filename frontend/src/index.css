@@ -855,3 +855,11 @@ h3 { font-size: 0.95rem; }
 .chip.miss { color: var(--red); border-color: var(--red); }
 .tips-list { margin: 0.8rem 0 0; padding-left: 1.1rem; font-size: 0.85rem; line-height: 1.6; }
 .company-link.unverified svg { color: var(--amber); }
+
+/* ===== Match on cards and AI tips ===== */
+.match-pill { display: inline-block; align-self: flex-start; padding: 0.15rem 0.5rem; font-family: var(--mono); font-size: 0.64rem; font-weight: 700; text-transform: uppercase; border: 1px solid currentColor; }
+.match-pill.strong { color: var(--green); }
+.match-pill.good { color: var(--orange-dark); }
+.match-pill.low { color: var(--muted); }
+.rewrite { margin-top: 0.7rem; padding: 0.7rem; font-size: 0.85rem; line-height: 1.5; border: 1px solid var(--line-strong); }
+.rewrite .before { color: var(--muted); text-decoration: line-through; }

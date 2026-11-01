@@ -91,3 +91,66 @@ def job_match(
     resume, text, _ = load_text(db, user, resume_id)
     result = match_job(text, job.skills or [], job.title, job.description)
     return MatchOut(resume_id=resume.id, resume_name=resume.version_name, **result)
+
+from app.ai import AIUnavailable
+from app.resume_tailor import tailor
+
+
+class Rewrite(BaseModel):
+    before: str
+    after: str
+
+
+class TipsOut(BaseModel):
+    summary: str | None = None
+    rewrites: list[Rewrite]
+    removed: int = 0
+
+
+@router.post("/jobs/{job_id}/resume-tips", response_model=TipsOut)
+def resume_tips(
+    job_id: int,
+    resume_id: int | None = Query(None),
+    db: Session = Depends(get_db),
+    user: User = Depends(seeker_only),
+):
+    row = db.execute(
+        select(Job, Company)
+        .join(Company, Job.company_id == Company.id)
+        .where(Job.id == job_id, Company.verification_status != "rejected")
+    ).first()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+    job, company = row
+
+    if resume_id is None:
+        default = db.scalar(
+            select(Resume)
+            .where(Resume.user_id == user.id)
+            .order_by(Resume.is_default.desc(), Resume.id.desc())
+        )
+        if default is None:
+            raise HTTPException(status_code=400, detail="Upload a resume first")
+        resume_id = default.id
+
+    resume, text, _ = load_text(db, user, resume_id)
+    if len(text.strip()) < 200:
+        raise HTTPException(
+            status_code=400,
+            detail="Your resume text could not be read. Use a text PDF, not a scan.",
+        )
+    try:
+        result = tailor(
+            f"{user.id}:{resume.id}:{job.id}",
+            user.id,
+            text,
+            job.title,
+            company.name,
+            job.description,
+            job.skills or [],
+        )
+    except PermissionError as exc:
+        raise HTTPException(status_code=429, detail=str(exc))
+    except AIUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return TipsOut(**result)

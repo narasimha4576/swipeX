@@ -9,6 +9,7 @@ from app.deps import get_current_user, get_db
 from app.models import Company, Job, Profile, User
 from app.schemas import CompanyOut, CountryCount, JobOut, JobPage, SafetyFlag, SafetyOut
 from app.safety import analyze
+from app.match_quick import quick_match, resume_skill_set
 
 router = APIRouter(tags=["jobs"])
 
@@ -143,7 +144,7 @@ def list_jobs(
     )
     rows = db.execute(stmt).all()
     return JobPage(
-        items=[job_to_out(job, company) for job, company in rows],
+        items=with_match(db, user, [(job, company) for job, company in rows]),
         total=total,
         page=page,
         page_size=page_size,
@@ -226,7 +227,9 @@ def jobs_for_you(
     user: User = Depends(get_current_user),
 ):
     profile = db.scalar(select(Profile).where(Profile.user_id == user.id))
-    mine = {s.lower() for s in (profile.skills or [])} if profile else set()
+    mine = ({s.lower() for s in (profile.skills or [])} if profile else set()) | (
+        resume_skill_set(db, user) or set()
+    )
     rows = db.execute(
         select(Job, Company)
         .join(Company, Job.company_id == Company.id)
@@ -239,6 +242,19 @@ def jobs_for_you(
     for job, company in rows:
         overlap = len(mine & {s.lower() for s in (job.skills or [])})
         verified = 1 if company.verification_status == "verified" else 0
-        scored.append((overlap, verified, job.created_at, job, company))
+        total = len(job.skills or [])
+        ratio = overlap / total if total else 0
+        scored.append((overlap + ratio, verified, job.created_at, job, company))
     scored.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
-    return [job_to_out(job, company) for _, _, _, job, company in scored[:12]]
+    return with_match(db, user, [(job, company) for _, _, _, job, company in scored[:12]])
+
+def with_match(db, user, pairs):
+    outs = [job_to_out(job, company) for job, company in pairs]
+    if user.role != "job_seeker":
+        return outs
+    have = resume_skill_set(db, user)
+    if not have:
+        return outs
+    for out in outs:
+        out.match = quick_match(have, out.skills)
+    return outs

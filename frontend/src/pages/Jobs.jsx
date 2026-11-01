@@ -11,6 +11,7 @@ import {
   TYPE_LABEL,
   isThirdParty,
   logoColor,
+  matchClass,
   salary,
   sourceBadge,
   timeAgo,
@@ -222,6 +223,9 @@ export default function Jobs() {
               </div>
             )}
 
+            {job.match != null && (
+              <div className={"match-pill " + matchClass(job.match)}>{job.match}% skills match</div>
+            )}
             <div className="salary">{salary(job)}</div>
 
             <div className="chips">
