@@ -22,6 +22,9 @@ function MiniJob({ job }) {
         </div>
         <div className="muted small">
           {job.match != null ? job.match + "% skills match | " : ""}{JOB_TYPE_LABEL[job.job_type] ?? job.job_type} | {sourceBadge(job.source)} | {timeAgo(job.created_at)}
+          {job.why && job.why.length > 0 && (
+            <div className="why-line">Why: {job.why.join(" | ")}</div>
+          )}
         </div>
       </div>
     </div>
@@ -122,7 +125,12 @@ export default function Home() {
 
       <div className="home-main">
         <form className="glass card" onSubmit={submit}>
-          <h2>Find your next job</h2>
+          <div className="row between">
+            <h2 style={{ margin: 0 }}>Find your next job</h2>
+            <Link className="btn small primary-inline" to="/discover">
+              Swipe jobs
+            </Link>
+          </div>
           <div className="search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" />

@@ -135,6 +135,7 @@ class JobOut(BaseModel):
     applicant_count: int
     competition_level: str
     match: int | None = None
+    why: list[str] = []
     source: str = "native"
     apply_url: str | None = None
     created_at: datetime

@@ -20,6 +20,7 @@ import CompanyWeb from "./pages/CompanyWeb";
 import ApplyReview from "./pages/ApplyReview";
 import ApplicationDetailsSection from "./pages/ApplicationDetailsSection";
 import ThemeToggle from "./pages/ThemeToggle";
+import NotificationBell from "./pages/NotificationBell";
 import ChatBot from "./pages/ChatBot";
 
 function Icon({ children }) {
@@ -115,7 +116,7 @@ function ProfilePage() {
 const TABS = {
   job_seeker: [
     ["/home", "Home", "home"],
-    ["/discover", "Discover", "discover"],
+    
     ["/jobs", "Jobs", "jobs"],
     
     ["/picks", "Picks", "picks"],
@@ -163,6 +164,7 @@ function Shell() {
         </nav>
 
         <div className="who">
+          <NotificationBell />
           <ThemeToggle />
           <span className="name">{user.full_name}</span>
           <span className={`badge ${user.role}`}>{user.role.replace("_", " ")}</span>

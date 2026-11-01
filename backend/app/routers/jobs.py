@@ -9,7 +9,7 @@ from app.deps import get_current_user, get_db
 from app.models import Company, Job, Profile, User
 from app.schemas import CompanyOut, CountryCount, JobOut, JobPage, SafetyFlag, SafetyOut
 from app.safety import analyze
-from app.match_quick import quick_match, resume_skill_set
+from app.match_quick import MATCH_POOL, fit, load_taste, quick_match, resume_skill_set
 
 router = APIRouter(tags=["jobs"])
 
@@ -65,7 +65,7 @@ def list_jobs(
     country: str | None = None,
     fresher_friendly: bool = False,
     low_competition: bool = False,
-    sort: Literal["newest", "salary", "competition"] = "newest",
+    sort: Literal["newest", "salary", "competition", "match"] = "newest",
     page: int = Query(1, ge=1),
     page_size: int = Query(9, ge=1, le=50),
     db: Session = Depends(get_db),
@@ -120,6 +120,11 @@ def list_jobs(
     if low_competition:
         conditions.append(Job.applicant_count < LOW_COMPETITION_MAX)
         conditions.append(Job.source == "native")
+
+    if sort == "match" and user.role == "job_seeker":
+        ranked = ranked_page(db, user, conditions, page, page_size)
+        if ranked is not None:
+            return ranked
 
     if sort == "salary":
         order = [Job.salary_max_lpa.desc().nulls_last(), Job.id.desc()]
@@ -226,27 +231,38 @@ def jobs_for_you(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    profile = db.scalar(select(Profile).where(Profile.user_id == user.id))
-    mine = ({s.lower() for s in (profile.skills or [])} if profile else set()) | (
-        resume_skill_set(db, user) or set()
-    )
+    taste = load_taste(db, user)
     rows = db.execute(
         select(Job, Company)
         .join(Company, Job.company_id == Company.id)
         .where(Job.is_active.is_(True), Company.verification_status != "rejected")
         .order_by(Job.created_at.desc())
-        .limit(500)
+        .limit(MATCH_POOL)
     ).all()
 
     scored = []
     for job, company in rows:
-        overlap = len(mine & {s.lower() for s in (job.skills or [])})
-        verified = 1 if company.verification_status == "verified" else 0
-        total = len(job.skills or [])
-        ratio = overlap / total if total else 0
-        scored.append((overlap + ratio, verified, job.created_at, job, company))
-    scored.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
-    return with_match(db, user, [(job, company) for _, _, _, job, company in scored[:12]])
+        if job.id in taste.skipped or job.id in taste.applied:
+            continue
+        points, why = fit(job, company, taste)
+        scored.append((points, why, job, company))
+    scored.sort(key=lambda item: item[0], reverse=True)
+
+    top = []
+    per_company = {}
+    for item in scored:
+        company_id = item[3].id
+        if per_company.get(company_id, 0) >= 2:
+            continue
+        per_company[company_id] = per_company.get(company_id, 0) + 1
+        top.append(item)
+        if len(top) == 12:
+            break
+
+    outs = with_match(db, user, [(job, company) for _, _, job, company in top])
+    for out, item in zip(outs, top):
+        out.why = item[1]
+    return outs
 
 def with_match(db, user, pairs):
     outs = [job_to_out(job, company) for job, company in pairs]
@@ -258,3 +274,28 @@ def with_match(db, user, pairs):
     for out in outs:
         out.match = quick_match(have, out.skills)
     return outs
+
+def ranked_page(db, user, conditions, page, page_size):
+    taste = load_taste(db, user)
+    if not taste.have:
+        return None
+    rows = db.execute(
+        select(Job, Company)
+        .join(Company, Job.company_id == Company.id)
+        .where(*conditions)
+        .order_by(Job.created_at.desc(), Job.id.desc())
+        .limit(MATCH_POOL)
+    ).all()
+    scored = sorted(
+        ((fit(job, company, taste)[0], job, company) for job, company in rows),
+        key=lambda item: item[0],
+        reverse=True,
+    )
+    start = (page - 1) * page_size
+    chunk = scored[start : start + page_size]
+    return JobPage(
+        items=with_match(db, user, [(job, company) for _, job, company in chunk]),
+        total=len(scored),
+        page=page,
+        page_size=page_size,
+    )

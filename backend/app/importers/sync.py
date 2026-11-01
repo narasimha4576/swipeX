@@ -155,5 +155,11 @@ def sync_all() -> dict:
                 totals["failed"] += 1
                 print(f"  Adzuna import failed: {exc}", flush=True)
 
+    try:
+        from app.notifications import check_saved_searches
+
+        totals["alerts"] = check_saved_searches()
+    except Exception as exc:
+        print(f"  Saved search check failed: {exc}", flush=True)
     print(f"Job import finished: {totals}", flush=True)
     return totals

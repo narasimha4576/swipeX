@@ -64,6 +64,29 @@ function toParams(f, page) {
   return p;
 }
 
+function savedFilters(f) {
+  const p = toParams(f, 1);
+  delete p.page;
+  delete p.page_size;
+  delete p.sort;
+  return p;
+}
+
+function activeCount(f) {
+  let n = 0;
+  if (f.country) n++;
+  if (f.verified_only) n++;
+  ["company_type", "job_type", "experience_level", "location", "skill", "max_age_days"].forEach((k) => {
+    if (String(f[k]).trim() !== "") n++;
+  });
+  if (f.min_salary !== "") n++;
+  ["remote", "fresher_friendly", "low_competition"].forEach((k) => {
+    if (f[k]) n++;
+  });
+  if (f.sort !== "newest") n++;
+  return n;
+}
+
 function clock(date) {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
@@ -89,11 +112,15 @@ export default function Jobs() {
   const [data, setData] = useState({ items: [], total: 0 });
   const [fresh, setFresh] = useState(null);
   const [countries, setCountries] = useState([]);
+  const [saved, setSaved] = useState([]);
+  const [saveName, setSaveName] = useState("");
+  const [savedMsg, setSavedMsg] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [updatedAt, setUpdatedAt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const latest = useRef({ filters, page, data });
+  const appliedSearch = useRef("");
 
   useEffect(() => {
     latest.current = { filters, page, data };
@@ -109,12 +136,57 @@ export default function Jobs() {
     setPage(1);
   }
 
+  function applySaved(search) {
+    setFilters({ ...EMPTY, ...search.filters });
+    setPage(1);
+    setShowPanel(false);
+  }
+
   useEffect(() => {
     api
       .get("/job-countries")
       .then(({ data }) => setCountries(data))
       .catch(() => {});
+    api
+      .get("/saved-searches")
+      .then(({ data }) => setSaved(data))
+      .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const id = searchParams.get("search");
+    if (!id || appliedSearch.current === id || saved.length === 0) return;
+    const found = saved.find((s) => String(s.id) === id);
+    if (found) {
+      appliedSearch.current = id;
+      applySaved(found);
+    }
+  }, [saved, searchParams]);
+
+  async function saveSearch() {
+    setSavedMsg("");
+    try {
+      const { data: created } = await api.post("/saved-searches", {
+        name: saveName.trim() || null,
+        filters: savedFilters(filters),
+      });
+      setSaved([created, ...saved]);
+      setSaveName("");
+      setSavedMsg("Saved. You will get a notification when new matching jobs arrive.");
+    } catch (err) {
+      setSavedMsg(errorMessage(err));
+    }
+  }
+
+  async function removeSaved(id) {
+    setSavedMsg("");
+    try {
+      await api.delete(`/saved-searches/${id}`);
+      setSaved(saved.filter((s) => s.id !== id));
+    } catch (err) {
+      setSavedMsg(errorMessage(err));
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -170,12 +242,21 @@ export default function Jobs() {
   }, [wide, data, selectedId]);
 
   const pages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
-  const panelCount =
-    [filters.location, filters.skill, filters.min_salary, filters.experience_level].filter(
-      (v) => String(v).trim() !== ""
-    ).length + (filters.sort !== "newest" ? 1 : 0);
-  const anyFilter =
-    JSON.stringify({ ...filters, sort: "newest" }) !== JSON.stringify({ ...EMPTY });
+  const count = activeCount(filters);
+  const anyFilter = count > 0 || filters.q.trim() !== "";
+  const canSave = Object.keys(savedFilters(filters)).some((k) => k !== "verified_only");
+
+  function chip([label, key, value]) {
+    return (
+      <button
+        key={label}
+        className={filters[key] === value ? "fchip on" : "fchip"}
+        onClick={() => update({ [key]: filters[key] === value ? EMPTY[key] : value })}
+      >
+        {label}
+      </button>
+    );
+  }
 
   const list = (
     <>
@@ -293,44 +374,34 @@ export default function Jobs() {
         />
       </div>
 
-      <div className="country-row">
-        <select value={filters.country} onChange={(e) => update({ country: e.target.value })}>
-          <option value="">All countries (worldwide)</option>
-          {countries.map((c) => (
-            <option key={c.country} value={c.country}>
-              {c.country} ({c.count})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="filter-bar">
-        <button
-          className={showPanel ? "fchip on" : "fchip"}
-          onClick={() => setShowPanel(!showPanel)}
-        >
-          Filters{panelCount > 0 ? ` (${panelCount})` : ""}
+      <div className="filters-row">
+        <button className={showPanel ? "fchip on" : "fchip"} onClick={() => setShowPanel(!showPanel)}>
+          Filters{count > 0 ? ` (${count})` : ""}
         </button>
-        <button
-          className={filters.verified_only ? "fchip on" : "fchip"}
-          onClick={() => update({ verified_only: !filters.verified_only })}
-        >
-          Verified only
-        </button>
-        {QUICK.map(([label, key, value]) => (
-          <button
-            key={label}
-            className={filters[key] === value ? "fchip on" : "fchip"}
-            onClick={() => update({ [key]: filters[key] === value ? EMPTY[key] : value })}
-          >
-            {label}
+        {anyFilter && (
+          <button className="fchip" onClick={reset}>
+            Clear all
           </button>
-        ))}
+        )}
       </div>
 
       {showPanel && (
         <div className="glass card panel">
+          <h4 className="sheet-title" style={{ marginTop: 0 }}>
+            Where
+          </h4>
           <div className="grid2">
+            <label className="field">
+              <span>Country</span>
+              <select value={filters.country} onChange={(e) => update({ country: e.target.value })}>
+                <option value="">All countries (worldwide)</option>
+                {countries.map((c) => (
+                  <option key={c.country} value={c.country}>
+                    {c.country} ({c.count})
+                  </option>
+                ))}
+              </select>
+            </label>
             <label className="field">
               <span>City or place</span>
               <input
@@ -339,6 +410,23 @@ export default function Jobs() {
                 placeholder="e.g. Berlin"
               />
             </label>
+          </div>
+
+          <h4 className="sheet-title">Company</h4>
+          <div className="chip-wrap">
+            <button
+              className={filters.verified_only ? "fchip on" : "fchip"}
+              onClick={() => update({ verified_only: !filters.verified_only })}
+            >
+              Verified only
+            </button>
+            {QUICK.filter(([, key]) => key === "company_type").map(chip)}
+          </div>
+
+          <h4 className="sheet-title">Job</h4>
+          <div className="chip-wrap">{QUICK.filter(([, key]) => key !== "company_type").map(chip)}</div>
+
+          <div className="grid2" style={{ marginTop: "0.8rem" }}>
             <label className="field">
               <span>Skill</span>
               <input
@@ -347,8 +435,6 @@ export default function Jobs() {
                 placeholder="e.g. Python"
               />
             </label>
-          </div>
-          <div className="grid2">
             <label className="field">
               <span>Minimum salary (LPA, SwipeX jobs only)</span>
               <input
@@ -359,6 +445,8 @@ export default function Jobs() {
                 placeholder="e.g. 8"
               />
             </label>
+          </div>
+          <div className="grid2">
             <label className="field">
               <span>Experience level</span>
               <select
@@ -372,18 +460,57 @@ export default function Jobs() {
                 <option value="senior">Senior</option>
               </select>
             </label>
+            <label className="field">
+              <span>Sort by</span>
+              <select value={filters.sort} onChange={(e) => update({ sort: e.target.value })}>
+                <option value="newest">Newest first</option>
+                <option value="salary">Highest salary</option>
+                <option value="competition">Fewest applicants</option>
+                <option value="match">Best match (needs skills or a resume)</option>
+              </select>
+            </label>
           </div>
-          <label className="field">
-            <span>Sort by</span>
-            <select value={filters.sort} onChange={(e) => update({ sort: e.target.value })}>
-              <option value="newest">Newest first</option>
-              <option value="salary">Highest salary</option>
-              <option value="competition">Fewest applicants</option>
-            </select>
-          </label>
-          <button className="btn small" onClick={reset}>
-            Reset all filters
-          </button>
+
+          <h4 className="sheet-title">Saved searches</h4>
+          {saved.length === 0 && (
+            <p className="muted small">
+              Choose your filters, save them, and SwipeX will notify you when new matching jobs arrive.
+            </p>
+          )}
+          {saved.map((s) => (
+            <div className="job-row" key={s.id}>
+              <strong>{s.name}</strong>
+              <span className="actions">
+                <button className="btn small" onClick={() => applySaved(s)}>
+                  Apply
+                </button>
+                <button className="btn small" onClick={() => removeSaved(s.id)}>
+                  Delete
+                </button>
+              </span>
+            </div>
+          ))}
+          <div className="save-row">
+            <input
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+              placeholder="Name this search (optional)"
+              maxLength={120}
+            />
+            <button className="btn small primary-inline" onClick={saveSearch} disabled={!canSave}>
+              Save this search
+            </button>
+          </div>
+          {savedMsg && <p className="muted small">{savedMsg}</p>}
+
+          <div className="actions" style={{ marginTop: "1rem" }}>
+            <button className="btn small" onClick={reset}>
+              Reset all filters
+            </button>
+            <button className="btn small primary-inline" onClick={() => setShowPanel(false)}>
+              Done
+            </button>
+          </div>
         </div>
       )}
 

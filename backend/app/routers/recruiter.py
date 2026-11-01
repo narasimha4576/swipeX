@@ -17,6 +17,7 @@ from app.models import (
 )
 from app.routers.jobs import job_to_out
 from app.safety import check_text
+from app.notifications import notify_status_change
 from app.routers.resumes import UPLOAD_DIR
 from app.schemas import (
     ApplicantOut,
@@ -247,6 +248,7 @@ def update_application_status(
     application = get_my_application(db, user, application_id)
     application.status = data.status
     db.commit()
+    notify_status_change(db, application)
     return StatusUpdate(status=application.status)
 
 
