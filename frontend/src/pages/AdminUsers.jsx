@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api, { errorMessage } from "../api";
 import { useAuth } from "../auth";
+import { Link } from "react-router-dom";
 
 export default function AdminUsers() {
   const { user: me } = useAuth();
@@ -53,7 +54,7 @@ export default function AdminUsers() {
             {users.map((u) => (
               <tr key={u.id}>
                 <td>{u.id}</td>
-                <td>{u.full_name}</td>
+                <td><Link className="link" to={"/admin/users/" + u.id}>{u.full_name}</Link></td>
                 <td>{u.email}</td>
                 <td>
                   <span className={`badge ${u.role}`}>{u.role.replace("_", " ")}</span>

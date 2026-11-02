@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.deps import get_db, require_roles
 from app.models import User
 from app.schemas import UserOut
+from app.admin_audit import log_admin
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -31,6 +32,7 @@ def set_user_active(
         raise HTTPException(status_code=400, detail="You cannot disable your own account")
 
     user.is_active = is_active
+    log_admin(db, admin, "enabled_account" if is_active else "disabled_account", user.id)
     db.commit()
     db.refresh(user)
     return user

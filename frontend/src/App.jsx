@@ -12,6 +12,12 @@ import ExperienceSection from "./pages/ExperienceSection";
 import PortfolioSection from "./pages/PortfolioSection";
 import Workspace from "./pages/Workspace";
 import Team from "./pages/Team";
+import Avatar from "./pages/Avatar";
+import PhotoAndSharing from "./pages/PhotoAndSharing";
+import EducationSection from "./pages/EducationSection";
+import PublicProfile from "./pages/PublicProfile";
+import AdminUserDetail from "./pages/AdminUserDetail";
+import AdminMonitor from "./pages/AdminMonitor";
 import AdminUsers from "./pages/AdminUsers";
 import AdminCompanies from "./pages/AdminCompanies";
 import JobDetail from "./pages/JobDetail";
@@ -108,6 +114,8 @@ function ProfilePage() {
       <Profile />
       <ApplicationDetailsSection />
       <ResumeSection />
+      <PhotoAndSharing />
+      <EducationSection />
       <ExperienceSection />
       <PortfolioSection />
     </div>
@@ -132,6 +140,7 @@ const TABS = {
   admin: [
     ["/admin/users", "Users", "users"],
     ["/admin/companies", "Companies", "companies"],
+    ["/admin/monitor", "Monitor", "users"],
     ["/jobs", "Jobs", "jobs"],
   ],
 };
@@ -170,7 +179,7 @@ function Shell() {
           <ThemeToggle />
           <span className="name">{user.full_name}</span>
           <span className={`badge ${user.role}`}>{user.role.replace("_", " ")}</span>
-          <span className="avatar">{user.full_name.trim().charAt(0).toUpperCase()}</span>
+          <Avatar user={user} />
           <button className="btn small" onClick={logout}>
             Log out
           </button>
@@ -195,6 +204,8 @@ function Shell() {
           {user.role === "recruiter" && <Route path="/team" element={<Team />} />}
           {user.role === "admin" && <Route path="/admin/users" element={<AdminUsers />} />}
           {user.role === "admin" && <Route path="/admin/companies" element={<AdminCompanies />} />}
+          {user.role === "admin" && <Route path="/admin/users/:id" element={<AdminUserDetail />} />}
+          {user.role === "admin" && <Route path="/admin/monitor" element={<AdminMonitor />} />}
           <Route path="*" element={<Navigate to={home} replace />} />
         </Routes>
       </main>
@@ -210,6 +221,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<AuthPage />} />
+          <Route path="/u/:slug" element={<PublicProfile />} />
           <Route path="/*" element={<Shell />} />
         </Routes>
       </AuthProvider>

@@ -39,6 +39,9 @@ class Profile(Base):
     experience_years: Mapped[float] = mapped_column(Float, default=0)
     skills: Mapped[list] = mapped_column(JSON, default=list)
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
+    photo_path: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    is_public: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    public_slug: Mapped[str | None] = mapped_column(String(60), unique=True, index=True, nullable=True)
     phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
     linkedin_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
     github_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
@@ -246,4 +249,27 @@ class CompanyInvite(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"), unique=True)
     code: Mapped[str] = mapped_column(String(20), unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+class Education(Base):
+    __tablename__ = "educations"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    school: Mapped[str] = mapped_column(String(200))
+    degree: Mapped[str] = mapped_column(String(120))
+    field_of_study: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    start_year: Mapped[int] = mapped_column(Integer)
+    end_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    grade: Mapped[str | None] = mapped_column(String(40), nullable=True)
+
+
+class AdminAudit(Base):
+    __tablename__ = "admin_audit"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    admin_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    action: Mapped[str] = mapped_column(String(40))
+    target_user_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    detail: Mapped[str | None] = mapped_column(String(300), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
