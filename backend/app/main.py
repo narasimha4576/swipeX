@@ -20,6 +20,7 @@ from app.routers import (
     explore,
     saved,
     notifications_api,
+    team,
     resume_ai,
     explore_web,
     autofill_ai,
@@ -62,6 +63,7 @@ app.include_router(autofill.router)
 app.include_router(explore.router)
 app.include_router(saved.router)
 app.include_router(notifications_api.router)
+app.include_router(team.router)
 app.include_router(resume_ai.router)
 app.include_router(explore_web.router)
 app.include_router(autofill_ai.router)

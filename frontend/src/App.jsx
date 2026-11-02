@@ -11,6 +11,7 @@ import ResumeSection from "./pages/ResumeSection";
 import ExperienceSection from "./pages/ExperienceSection";
 import PortfolioSection from "./pages/PortfolioSection";
 import Workspace from "./pages/Workspace";
+import Team from "./pages/Team";
 import AdminUsers from "./pages/AdminUsers";
 import AdminCompanies from "./pages/AdminCompanies";
 import JobDetail from "./pages/JobDetail";
@@ -125,6 +126,7 @@ const TABS = {
   ],
   recruiter: [
     ["/workspace", "Workspace", "workspace"],
+    ["/team", "Team", "workspace"],
     ["/jobs", "Jobs", "jobs"],
   ],
   admin: [
@@ -190,6 +192,7 @@ function Shell() {
           {user.role === "job_seeker" && <Route path="/picks" element={<Picks />} />}
           {user.role === "job_seeker" && <Route path="/profile" element={<ProfilePage />} />}
           {user.role === "recruiter" && <Route path="/workspace" element={<Workspace />} />}
+          {user.role === "recruiter" && <Route path="/team" element={<Team />} />}
           {user.role === "admin" && <Route path="/admin/users" element={<AdminUsers />} />}
           {user.role === "admin" && <Route path="/admin/companies" element={<AdminCompanies />} />}
           <Route path="*" element={<Navigate to={home} replace />} />

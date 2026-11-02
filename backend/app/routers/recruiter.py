@@ -17,6 +17,7 @@ from app.models import (
 )
 from app.routers.jobs import job_to_out
 from app.safety import check_text
+from app.team_tools import is_owner, my_company_id
 from app.notifications import notify_status_change
 from app.routers.resumes import UPLOAD_DIR
 from app.schemas import (
@@ -64,6 +65,11 @@ def save_company(
     name = data.name.strip()
     company = get_my_company(db, user)
 
+    if company is not None and not is_owner(db, user, company):
+        raise HTTPException(
+            status_code=403, detail="Only the company owner can edit the company profile"
+        )
+
     clash = db.scalar(select(Company).where(func.lower(Company.name) == name.lower()))
     if clash is not None and (company is None or clash.id != company.id):
         raise HTTPException(status_code=400, detail="A company with this name already exists")
@@ -105,7 +111,7 @@ def my_jobs(
     rows = db.execute(
         select(Job, Company)
         .join(Company, Job.company_id == Company.id)
-        .where(Job.posted_by == user.id)
+        .where(Job.company_id == my_company_id(db, user))
         .order_by(Job.created_at.desc(), Job.id.desc())
     ).all()
     return [to_my_job_out(job, company) for job, company in rows]
@@ -158,7 +164,7 @@ def set_job_active(
     user: User = Depends(recruiter_only),
 ):
     job = db.get(Job, job_id)
-    if job is None or job.posted_by != user.id:
+    if job is None or job.company_id != my_company_id(db, user):
         raise HTTPException(status_code=404, detail="Job not found")
     job.is_active = is_active
     db.commit()
@@ -172,7 +178,7 @@ APPLICATION_STATUSES = ("applied", "shortlisted", "interview", "rejected")
 
 def get_my_job(db: Session, user: User, job_id: int) -> Job:
     job = db.get(Job, job_id)
-    if job is None or job.posted_by != user.id:
+    if job is None or job.company_id != my_company_id(db, user):
         raise HTTPException(status_code=404, detail="Job not found")
     return job
 
@@ -182,7 +188,7 @@ def get_my_application(db: Session, user: User, application_id: int) -> Applicat
     if application is None or application.status == "saved":
         raise HTTPException(status_code=404, detail="Application not found")
     job = db.get(Job, application.job_id)
-    if job is None or job.posted_by != user.id:
+    if job is None or job.company_id != my_company_id(db, user):
         raise HTTPException(status_code=404, detail="Application not found")
     return application
 
@@ -268,3 +274,35 @@ def applicant_resume(
     return FileResponse(
         path, media_type="application/pdf", filename=f"{resume.version_name}.pdf"
     )
+
+@router.patch("/jobs/{job_id}", response_model=MyJobOut)
+def edit_job(
+    job_id: int,
+    data: JobCreate,
+    db: Session = Depends(get_db),
+    user: User = Depends(recruiter_only),
+):
+    job = get_my_job(db, user, job_id)
+    serious = [
+        f
+        for f in check_text(f"{data.title}\n{data.description}", official=True)
+        if f.severity == "high"
+    ]
+    if serious:
+        raise HTTPException(
+            status_code=400,
+            detail="This posting cannot be saved. " + serious[0].text,
+        )
+    job.title = data.title.strip()
+    job.description = data.description.strip()
+    job.location = (data.location or "").strip() or ("Remote" if data.is_remote else None)
+    job.is_remote = data.is_remote
+    job.job_type = data.job_type
+    job.experience_level = data.experience_level
+    job.salary_min_lpa = data.salary_min_lpa
+    job.salary_max_lpa = data.salary_max_lpa
+    job.skills = data.skills
+    db.commit()
+    db.refresh(job)
+    company = db.get(Company, job.company_id)
+    return to_my_job_out(job, company)

@@ -239,3 +239,11 @@ class Notification(Base):
     count: Mapped[int] = mapped_column(Integer, default=0)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+class CompanyInvite(Base):
+    __tablename__ = "company_invites"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"), unique=True)
+    code: Mapped[str] = mapped_column(String(20), unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
