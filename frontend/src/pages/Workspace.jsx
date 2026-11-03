@@ -2,15 +2,7 @@ import { useEffect, useState } from "react";
 import api, { errorMessage } from "../api";
 import MyPostingsList from "./MyPostings";
 import VerificationCard from "./VerificationCard";
-import {
-  COMP_LABEL,
-  JOB_TYPE_LABEL,
-  LEVEL_LABEL,
-  TYPE_LABEL,
-  logoColor,
-  salary,
-  timeAgo,
-} from "../jobUtils";
+import { TYPE_LABEL, logoColor } from "../jobUtils";
 
 const emptyCompany = {
   name: "",

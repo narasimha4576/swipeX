@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api, { errorMessage } from "../api";
+import api from "../api";
 
 export default function Avatar({ user }) {
   const [url, setUrl] = useState(null);

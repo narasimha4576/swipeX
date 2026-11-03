@@ -181,3 +181,16 @@ def disable_user(db):
         db.commit()
 
     return _disable
+
+@pytest.fixture
+def recruiter2(register, login):
+    user = register("recruiter2@example.com", role="recruiter", name="Recruiter Two")
+    return {"user": user, "headers": login("recruiter2@example.com")}
+
+@pytest.fixture(autouse=True)
+def reset_in_memory_limits():
+    """Rate limits are remembered in memory, so every test starts with a clean slate."""
+    from app.routers import team
+
+    team._attempts.clear()
+    yield

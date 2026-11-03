@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import api, { errorMessage } from "../api";
 import CompanyLink from "./CompanyLink";
 import OtherPortals from "./OtherPortals";
-import { JOB_TYPE_LABEL, TYPE_LABEL, logoColor, timeAgo } from "../jobUtils";
+import { JOB_TYPE_LABEL, TYPE_LABEL, timeAgo } from "../jobUtils";
 
 const LEVEL = {
   strong: "Strong evidence",
