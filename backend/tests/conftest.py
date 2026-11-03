@@ -194,3 +194,28 @@ def reset_in_memory_limits():
 
     team._attempts.clear()
     yield
+
+@pytest.fixture(autouse=True)
+def reset_security_limits():
+    from app.ratelimit import reset_all_limiters
+
+    reset_all_limiters()
+    yield
+
+
+@pytest.fixture(autouse=True)
+def temp_uploads(tmp_path, monkeypatch):
+    """Resumes and photos made by tests go to a temporary folder that is deleted afterwards."""
+    import importlib
+
+    folder = tmp_path / "uploads"
+    folder.mkdir()
+    for name in ("app.routers.resumes", "app.routers.recruiter", "app.routers.resume_ai", "app.match_quick"):
+        module = importlib.import_module(name)
+        if hasattr(module, "UPLOAD_DIR"):
+            monkeypatch.setattr(module, "UPLOAD_DIR", folder)
+    extras = importlib.import_module("app.routers.profile_extras")
+    photos = folder / "photos"
+    photos.mkdir()
+    monkeypatch.setattr(extras, "PHOTO_DIR", photos)
+    yield

@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from app.security_setup import cors_origins, install_security
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
@@ -43,7 +44,7 @@ app = FastAPI(title="SwipeX API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -85,3 +86,5 @@ def health_db():
     with engine.connect() as conn:
         conn.execute(text("SELECT 1"))
     return {"database": "ok"}
+
+install_security(app)

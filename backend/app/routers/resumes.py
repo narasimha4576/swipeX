@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from app.deps import get_db, require_roles
 from app.models import Application, Resume, User
 from app.resume_tools import read_pdf
+from app.upload_checks import validate_pdf
 from app.schemas import ResumeOut
 
 router = APIRouter(prefix="/resumes", tags=["resumes"])
@@ -74,6 +75,7 @@ def upload_resume(
     if not content.startswith(b"%PDF"):
         raise HTTPException(status_code=400, detail="Please upload a PDF file")
 
+    validate_pdf(content)
     filename = f"{uuid.uuid4().hex}.pdf"
     (UPLOAD_DIR / filename).write_bytes(content)
     parsed_text, _pages = read_pdf(UPLOAD_DIR / filename)
