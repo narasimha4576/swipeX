@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -36,7 +37,8 @@ from app.routers import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    start_scheduler()
+    if os.getenv("RUN_SCHEDULER_IN_API", "true").lower() == "true":
+        start_scheduler()
     yield
     stop_scheduler()
 
@@ -90,3 +92,7 @@ def health_db():
     return {"database": "ok"}
 
 install_security(app)
+
+from app.perf import install_performance  # noqa: E402
+
+install_performance(app, engine)

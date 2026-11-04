@@ -9,6 +9,7 @@ from app.deps import get_current_user, get_db
 from app.models import Company, Job, Profile, User
 from app.schemas import CompanyOut, CountryCount, JobOut, JobPage, SafetyFlag, SafetyOut
 from app.safety import analyze
+from app.cache import cached
 from app.match_quick import MATCH_POOL, fit, load_taste, quick_match, resume_skill_set
 
 router = APIRouter(tags=["jobs"])
@@ -211,19 +212,22 @@ def job_countries(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    rows = db.execute(
-        select(Job.country, func.count(Job.id))
-        .join(Company, Job.company_id == Company.id)
-        .where(
-            Job.is_active.is_(True),
-            Job.country.is_not(None),
-            Company.verification_status != "rejected",
-        )
-        .group_by(Job.country)
-        .order_by(func.count(Job.id).desc())
-        .limit(80)
-    ).all()
-    return [CountryCount(country=name, count=total) for name, total in rows]
+    def build():
+        rows = db.execute(
+            select(Job.country, func.count(Job.id))
+            .join(Company, Job.company_id == Company.id)
+            .where(
+                Job.is_active.is_(True),
+                Job.country.is_not(None),
+                Company.verification_status != "rejected",
+            )
+            .group_by(Job.country)
+            .order_by(func.count(Job.id).desc())
+            .limit(80)
+        ).all()
+        return [CountryCount(country=name, count=total) for name, total in rows]
+
+    return cached("job-countries", 300, build)
 
 
 @router.get("/jobs-for-you", response_model=list[JobOut])

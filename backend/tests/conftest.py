@@ -219,3 +219,10 @@ def temp_uploads(tmp_path, monkeypatch):
     photos.mkdir()
     monkeypatch.setattr(extras, "PHOTO_DIR", photos)
     yield
+
+@pytest.fixture(autouse=True)
+def empty_cache():
+    from app.cache import clear_cache
+
+    clear_cache()
+    yield

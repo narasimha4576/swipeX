@@ -3,10 +3,16 @@ from datetime import datetime, timedelta, timezone
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from app.importers.sync import sync_all
+from app.importers.sync import sync_all as run_import_unlocked
+from app.joblock import IMPORT_LOCK_ID, run_exclusive
 from app.maintenance import SKIP_RETENTION_DAYS, cleanup_old_skips
 
 scheduler = BackgroundScheduler()
+
+
+def sync_all():
+    """The job import, but only one copy of it runs at a time (even across the website and the worker)."""
+    return run_exclusive(IMPORT_LOCK_ID, run_import_unlocked)
 
 
 def start_scheduler() -> None:
