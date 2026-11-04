@@ -23,6 +23,7 @@ from app.routers import (
     notifications_api,
     team,
     profile_extras,
+    account,
     admin_monitor,
     resume_ai,
     explore_web,
@@ -70,6 +71,7 @@ app.include_router(team.router)
 app.include_router(profile_extras.router)
 app.include_router(profile_extras.public_router)
 app.include_router(admin_monitor.router)
+app.include_router(account.router)
 app.include_router(resume_ai.router)
 app.include_router(explore_web.router)
 app.include_router(autofill_ai.router)

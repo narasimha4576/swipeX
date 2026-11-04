@@ -899,3 +899,13 @@ h3 { font-size: 0.95rem; }
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.8rem; margin-top: 1rem; }
 .stat { padding: 0.8rem; border: 1px solid var(--line-strong); background: var(--white); }
 .stat-num { font-family: var(--mono); font-size: 1.6rem; font-weight: 700; }
+
+/* ===== Legal pages, footer, account link ===== */
+a.name { color: inherit; text-decoration: none; }
+a.name:hover { text-decoration: underline; }
+.legal-footer { padding: 1rem; text-align: center; font-size: 0.8rem; color: var(--muted); }
+.legal-footer a { color: inherit; text-decoration: underline; }
+.legal-page { max-width: 780px; margin: 0 auto; padding: 1.5rem 1rem 3rem; line-height: 1.6; }
+.legal-page h2 { margin-top: 1.6rem; font-size: 1.15rem; }
+.legal-page ul { padding-left: 1.2rem; }
+.legal-page li { margin-bottom: 0.4rem; }

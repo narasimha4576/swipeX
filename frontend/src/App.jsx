@@ -16,6 +16,10 @@ import Avatar from "./pages/Avatar";
 import PhotoAndSharing from "./pages/PhotoAndSharing";
 import EducationSection from "./pages/EducationSection";
 import PublicProfile from "./pages/PublicProfile";
+import AccountPage from "./pages/AccountPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
+import LegalFooter from "./pages/LegalFooter";
 import AdminUserDetail from "./pages/AdminUserDetail";
 import AdminMonitor from "./pages/AdminMonitor";
 import AdminUsers from "./pages/AdminUsers";
@@ -177,7 +181,7 @@ function Shell() {
         <div className="who">
           <NotificationBell />
           <ThemeToggle />
-          <span className="name">{user.full_name}</span>
+          <NavLink className="name" to="/account" title="Account and privacy">{user.full_name}</NavLink>
           <span className={`badge ${user.role}`}>{user.role.replace("_", " ")}</span>
           <Avatar user={user} />
           <button className="btn small" onClick={logout}>
@@ -206,6 +210,7 @@ function Shell() {
           {user.role === "admin" && <Route path="/admin/companies" element={<AdminCompanies />} />}
           {user.role === "admin" && <Route path="/admin/users/:id" element={<AdminUserDetail />} />}
           {user.role === "admin" && <Route path="/admin/monitor" element={<AdminMonitor />} />}
+          <Route path="/account" element={<AccountPage />} />
           <Route path="*" element={<Navigate to={home} replace />} />
         </Routes>
       </main>
@@ -220,8 +225,10 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/login" element={<AuthPage />} />
-          <Route path="/u/:slug" element={<PublicProfile />} />
+          <Route path="/login" element={<><AuthPage /><LegalFooter /></>} />
+          <Route path="/u/:slug" element={<><PublicProfile /><LegalFooter /></>} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="/*" element={<Shell />} />
         </Routes>
       </AuthProvider>
