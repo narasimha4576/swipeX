@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 from app.importers.sync import sync_all as run_import_unlocked
 from app.joblock import IMPORT_LOCK_ID, run_exclusive
+from app.status import record_import
 from app.maintenance import SKIP_RETENTION_DAYS, cleanup_old_skips
 
 scheduler = BackgroundScheduler()
@@ -12,7 +13,12 @@ scheduler = BackgroundScheduler()
 
 def sync_all():
     """The job import, but only one copy of it runs at a time (even across the website and the worker)."""
-    return run_exclusive(IMPORT_LOCK_ID, run_import_unlocked)
+    def work():
+        totals = run_import_unlocked()
+        record_import(totals)
+        return totals
+
+    return run_exclusive(IMPORT_LOCK_ID, work)
 
 
 def start_scheduler() -> None:
@@ -44,6 +50,30 @@ def start_scheduler() -> None:
     else:
         print("Job import is switched off (IMPORT_ENABLED=false)", flush=True)
 
+    from apscheduler.events import EVENT_JOB_ERROR
+
+    from app.errors import cleanup_old_errors, report_job_error
+    from app.status import heartbeat
+
+    scheduler.add_listener(report_job_error, EVENT_JOB_ERROR)
+    scheduler.add_job(
+        heartbeat,
+        "interval",
+        seconds=60,
+        id="heartbeat",
+        next_run_time=now,
+        max_instances=1,
+        coalesce=True,
+    )
+    scheduler.add_job(
+        cleanup_old_errors,
+        "interval",
+        hours=6,
+        id="cleanup-errors",
+        next_run_time=now + timedelta(seconds=45),
+        max_instances=1,
+        coalesce=True,
+    )
     scheduler.start()
 
 

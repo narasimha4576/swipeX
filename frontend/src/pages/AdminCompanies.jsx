@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api, { errorMessage } from "../api";
 import { TYPE_LABEL, logoColor } from "../jobUtils";
 
@@ -23,7 +23,7 @@ export default function AdminCompanies() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const { data } = await api.get("/admin/companies", {
@@ -35,11 +35,11 @@ export default function AdminCompanies() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [filter]);
 
   useEffect(() => {
     load();
-  }, [filter]);
+  }, [load]);
 
   async function decide(company, decision) {
     setError("");

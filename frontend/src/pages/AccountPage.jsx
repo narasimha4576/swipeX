@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import api, { errorMessage } from "../api";
-import { useAuth } from "../auth";
+import { useAuth } from "../authContext";
 
 export default function AccountPage() {
   const { user } = useAuth();

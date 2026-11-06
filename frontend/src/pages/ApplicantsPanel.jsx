@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api, { errorMessage } from "../api";
 import { matchClass, timeAgo } from "../jobUtils";
 
@@ -44,7 +44,7 @@ export default function ApplicantsPanel({ job }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function load() {
+  const load = useCallback(async () => {
     try {
       const { data } = await api.get(`/recruiter/jobs/${job.id}/applicants`);
       setItems(data);
@@ -53,11 +53,11 @@ export default function ApplicantsPanel({ job }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [job.id]);
 
   useEffect(() => {
     load();
-  }, [job.id]);
+  }, [load]);
 
   async function setStatus(a, status) {
     setError("");

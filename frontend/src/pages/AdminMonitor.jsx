@@ -1,3 +1,4 @@
+import { fromServer } from "../time";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api, { errorMessage } from "../api";
@@ -71,7 +72,7 @@ export default function AdminMonitor() {
                     </Link>
                   </td>
                   <td>{u.role.replace("_", " ")}</td>
-                  <td>{new Date(u.created_at).toLocaleString()}</td>
+                  <td>{fromServer(u.created_at).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -97,7 +98,7 @@ export default function AdminMonitor() {
               <tbody>
                 {d.activity_log.map((a, i) => (
                   <tr key={i}>
-                    <td>{new Date(a.when).toLocaleString()}</td>
+                    <td>{fromServer(a.when).toLocaleString()}</td>
                     <td>{a.admin}</td>
                     <td>{a.action.replace(/_/g, " ")}</td>
                     <td>{a.target ?? "-"}</td>

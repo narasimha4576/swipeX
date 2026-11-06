@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../auth";
+import { useAuth } from "../authContext";
 import { errorMessage } from "../api";
 import ThemeToggle from "./ThemeToggle";
 

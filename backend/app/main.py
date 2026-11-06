@@ -25,6 +25,8 @@ from app.routers import (
     team,
     profile_extras,
     account,
+    monitoring,
+    admin_system,
     admin_monitor,
     resume_ai,
     explore_web,
@@ -74,6 +76,8 @@ app.include_router(profile_extras.router)
 app.include_router(profile_extras.public_router)
 app.include_router(admin_monitor.router)
 app.include_router(account.router)
+app.include_router(monitoring.router)
+app.include_router(admin_system.router)
 app.include_router(resume_ai.router)
 app.include_router(explore_web.router)
 app.include_router(autofill_ai.router)
@@ -96,3 +100,7 @@ install_security(app)
 from app.perf import install_performance  # noqa: E402
 
 install_performance(app, engine)
+
+from app.errors import install_error_tracking  # noqa: E402
+
+install_error_tracking(app)

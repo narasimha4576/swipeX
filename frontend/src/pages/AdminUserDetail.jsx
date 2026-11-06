@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { fromServer } from "../time";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
 import api, { errorMessage } from "../api";
-import { useAuth } from "../auth";
+import { useAuth } from "../authContext";
 
 function label(key) {
   const text = key.replace(/_/g, " ");
@@ -11,7 +12,7 @@ function label(key) {
 function show(key, value) {
   if (value === null || value === undefined || value === "") return "-";
   if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (key.endsWith("_at")) return new Date(value).toLocaleString();
+  if (key.endsWith("_at")) return fromServer(value).toLocaleString();
   return String(value);
 }
 
@@ -35,17 +36,17 @@ export default function AdminUserDetail() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
 
-  function load() {
+  const load = useCallback(() => {
     api
       .get(`/admin/users/${id}/detail`)
       .then(({ data }) => setData(data))
       .catch((err) => setError(errorMessage(err)));
-  }
+  }, [id]);
 
   useEffect(() => {
     setData(null);
     load();
-  }, [id]);
+  }, [load]);
 
   async function toggleActive() {
     setError("");

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
-import { useAuth } from "../auth";
+import { useAuth } from "../authContext";
 import CompanyLink from "./CompanyLink";
 import { JOB_TYPE_LABEL, logoColor, sourceBadge, timeAgo } from "../jobUtils";
 

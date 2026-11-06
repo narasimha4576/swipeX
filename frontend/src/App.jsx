@@ -1,33 +1,36 @@
+import { lazyPage } from "./lazyPage";
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-dom";
-import { AuthProvider, useAuth } from "./auth";
+import { AuthProvider } from "./auth";
+import { useAuth } from "./authContext";
 import AuthPage from "./pages/AuthPage";
-import Discover from "./pages/Discover";
+const Discover = lazyPage(() => import("./pages/Discover"));
 import Jobs from "./pages/Jobs";
 import Home from "./pages/Home";
-import Applications from "./pages/Applications";
-import Picks from "./pages/Picks";
+const Applications = lazyPage(() => import("./pages/Applications"));
+const Picks = lazyPage(() => import("./pages/Picks"));
 import Profile from "./pages/Profile";
 import ResumeSection from "./pages/ResumeSection";
 import ExperienceSection from "./pages/ExperienceSection";
 import PortfolioSection from "./pages/PortfolioSection";
-import Workspace from "./pages/Workspace";
-import Team from "./pages/Team";
+const Workspace = lazyPage(() => import("./pages/Workspace"));
+const Team = lazyPage(() => import("./pages/Team"));
 import Avatar from "./pages/Avatar";
 import PhotoAndSharing from "./pages/PhotoAndSharing";
 import EducationSection from "./pages/EducationSection";
-import PublicProfile from "./pages/PublicProfile";
-import AccountPage from "./pages/AccountPage";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Terms from "./pages/Terms";
+const PublicProfile = lazyPage(() => import("./pages/PublicProfile"));
+const AccountPage = lazyPage(() => import("./pages/AccountPage"));
+const PrivacyPolicy = lazyPage(() => import("./pages/PrivacyPolicy"));
+const Terms = lazyPage(() => import("./pages/Terms"));
 import LegalFooter from "./pages/LegalFooter";
-import AdminUserDetail from "./pages/AdminUserDetail";
-import AdminMonitor from "./pages/AdminMonitor";
-import AdminUsers from "./pages/AdminUsers";
-import AdminCompanies from "./pages/AdminCompanies";
+const AdminUserDetail = lazyPage(() => import("./pages/AdminUserDetail"));
+const AdminMonitor = lazyPage(() => import("./pages/AdminMonitor"));
+const AdminSystem = lazyPage(() => import("./pages/AdminSystem"));
+const AdminUsers = lazyPage(() => import("./pages/AdminUsers"));
+const AdminCompanies = lazyPage(() => import("./pages/AdminCompanies"));
 import JobDetail from "./pages/JobDetail";
 import CompanySearch from "./pages/CompanySearch";
-import CompanyProfile from "./pages/CompanyProfile";
-import CompanyWeb from "./pages/CompanyWeb";
+const CompanyProfile = lazyPage(() => import("./pages/CompanyProfile"));
+const CompanyWeb = lazyPage(() => import("./pages/CompanyWeb"));
 import ApplyReview from "./pages/ApplyReview";
 import ApplicationDetailsSection from "./pages/ApplicationDetailsSection";
 import ThemeToggle from "./pages/ThemeToggle";
@@ -145,6 +148,7 @@ const TABS = {
     ["/admin/users", "Users", "users"],
     ["/admin/companies", "Companies", "companies"],
     ["/admin/monitor", "Monitor", "users"],
+    ["/admin/system", "System", "users"],
     ["/jobs", "Jobs", "jobs"],
   ],
 };
@@ -183,7 +187,7 @@ function Shell() {
           <ThemeToggle />
           <NavLink className="name" to="/account" title="Account and privacy">{user.full_name}</NavLink>
           <span className={`badge ${user.role}`}>{user.role.replace("_", " ")}</span>
-          <Avatar user={user} />
+          <Avatar key={user.id} user={user} />
           <button className="btn small" onClick={logout}>
             Log out
           </button>
@@ -210,6 +214,7 @@ function Shell() {
           {user.role === "admin" && <Route path="/admin/companies" element={<AdminCompanies />} />}
           {user.role === "admin" && <Route path="/admin/users/:id" element={<AdminUserDetail />} />}
           {user.role === "admin" && <Route path="/admin/monitor" element={<AdminMonitor />} />}
+          {user.role === "admin" && <Route path="/admin/system" element={<AdminSystem />} />}
           <Route path="/account" element={<AccountPage />} />
           <Route path="*" element={<Navigate to={home} replace />} />
         </Routes>

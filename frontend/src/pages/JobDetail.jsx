@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import api, { errorMessage } from "../api";
-import { useAuth } from "../auth";
+import { useAuth } from "../authContext";
 import CompanyLink from "./CompanyLink";
 import SafetyCard from "./SafetyCard";
 import MatchCard from "./MatchCard";

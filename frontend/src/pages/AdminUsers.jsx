@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api, { errorMessage } from "../api";
-import { useAuth } from "../auth";
+import { useAuth } from "../authContext";
 import { Link } from "react-router-dom";
 
 export default function AdminUsers() {

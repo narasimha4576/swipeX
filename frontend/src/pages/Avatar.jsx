@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "../api";
 
 export default function Avatar({ user }) {
   const [url, setUrl] = useState(null);
 
-  async function load() {
+  const load = useCallback(async () => {
     if (user.role !== "job_seeker") return;
     try {
       const { data } = await api.get("/profile/extras");
@@ -12,13 +12,13 @@ export default function Avatar({ user }) {
     } catch {
       setUrl(null);
     }
-  }
+  }, [user.role]);
 
   useEffect(() => {
     load();
     window.addEventListener("swipex-photo", load);
     return () => window.removeEventListener("swipex-photo", load);
-  }, [user.id]);
+  }, [load]);
 
   if (url) return <img className="avatar avatar-img" src={url} alt="" />;
   return <span className="avatar">{user.full_name.trim().charAt(0).toUpperCase()}</span>;

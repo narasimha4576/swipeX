@@ -273,3 +273,26 @@ class AdminAudit(Base):
     target_user_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
     detail: Mapped[str | None] = mapped_column(String(300), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+class ErrorEvent(Base):
+    __tablename__ = "error_events"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    error_id: Mapped[str] = mapped_column(String(16), index=True)
+    fingerprint: Mapped[str] = mapped_column(String(16), index=True)
+    kind: Mapped[str] = mapped_column(String(120))
+    message: Mapped[str] = mapped_column(String(300))
+    trace: Mapped[str] = mapped_column(Text, default="")
+    method: Mapped[str] = mapped_column(String(10))
+    path: Mapped[str] = mapped_column(String(200))
+    status_code: Mapped[int] = mapped_column(Integer, default=500)
+    source: Mapped[str] = mapped_column(String(20), default="api")
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), index=True)
+
+
+class SystemStatus(Base):
+    __tablename__ = "system_status"
+
+    key: Mapped[str] = mapped_column(String(50), primary_key=True)
+    value: Mapped[str] = mapped_column(Text, default="")
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
