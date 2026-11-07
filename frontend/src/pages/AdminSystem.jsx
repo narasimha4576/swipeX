@@ -142,9 +142,7 @@ export default function AdminSystem() {
             <p className="muted small">The same error is grouped into one line. Nothing personal is saved.</p>
           </div>
           <div className="actions">
-            <button className="btn small" onClick={testError}>
-              Create a test error
-            </button>
+            {system.environment !== "production" && (<button className="btn small" onClick={testError}>Create a test error</button>)}
             <button className="btn small" onClick={clearAll} disabled={errors.length === 0}>
               Clear all
             </button>

@@ -7,3 +7,5 @@ dist/
 backend/uploads/
 
 .pytest_cache/
+
+.env.prod

@@ -2,7 +2,7 @@
 export const LEGAL = {
   product: "SwipeX",
   operator: "Lakshmi Narasimha",
-  contactEmail: "narasimha4576@gmail.com",
+  contactEmail: "lakshminarasimha.contact@gmail.com",
   country: "India",
-  updated: "3 November 2026",
+  updated: "7 November 2026",
 };
