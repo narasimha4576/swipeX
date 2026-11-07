@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&family=Zen+Dots&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap");
 
 :root {
   --bg: #e4e4e4;
@@ -925,3 +925,133 @@ a.name:hover { text-decoration: underline; }
 .funnel-fill { height: 100%; background: var(--orange); }
 .funnel-num { font-family: var(--mono); text-align: right; }
 @media (max-width: 640px) { .funnel-row { grid-template-columns: 1fr; gap: 0.2rem; } .funnel-num { text-align: left; } }
+
+/* ============================================================
+   Soft capsule theme.
+   To go back: delete everything from this comment to the end of the file
+   and restore the font @import on the first line.
+   ============================================================ */
+:root {
+  --font-ui: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-title: "Nunito", system-ui, sans-serif;
+  --display: "Nunito", system-ui, sans-serif;
+  --mono: "Nunito", system-ui, sans-serif;
+  --r-pill: 999px;
+  --r-card: 24px;
+  --r-box: 18px;
+  --soft-shadow: 0 8px 28px rgba(22, 22, 22, 0.08);
+  --glow: 0 14px 34px rgba(255, 106, 26, 0.28);
+}
+
+* { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+body { font-family: var(--font-ui); font-size: 15px; font-weight: 500; }
+
+/* ---- text: normal capitalization, rounded bold headings ---- */
+h1, h2, h3, h4, .brand, .nav-link, .field > span, .btn, .tab, .chip, .badge, th, .meta, details summary, .comp,
+.fchip, .stat, .level, .content > section:not(.card) > .section-head h2, .sheet-title, .detail-title,
+.review-row > :first-child, .update-banner, .chat-fab, .chat-head, .match-pill {
+  text-transform: none;
+  letter-spacing: 0;
+}
+h1, h2, h3, h4, .brand, .detail-title, .content > section:not(.card) > .section-head h2 { font-weight: 800; }
+.brand { font-size: 1.35rem; }
+.brand::before { border-radius: 10px; }
+.stat-num, .bar-count, .funnel-num, .bell-count, .score-big { font-variant-numeric: tabular-nums; font-weight: 800; }
+
+/* ---- cards and panels ---- */
+.glass { border-radius: var(--r-card); border: 1px solid var(--line); box-shadow: var(--soft-shadow); }
+:root[data-theme="dark"] .glass { border-color: var(--line-strong); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45); }
+.job-card { border-radius: var(--r-card); }
+.job-card:hover { border-color: var(--orange); box-shadow: var(--glow); }
+.job-card.active { border-color: var(--orange); box-shadow: 0 0 0 2px var(--orange), var(--glow); }
+:root[data-theme="dark"] .job-card:hover { box-shadow: var(--glow); }
+:root[data-theme="dark"] .job-card.active { box-shadow: 0 0 0 2px var(--orange), var(--glow); }
+
+.swipe-card { border-radius: 30px; overflow: hidden; border-color: var(--line); box-shadow: 0 18px 44px rgba(0, 0, 0, 0.18); }
+.swipe-card .logo { border-radius: 18px; }
+.stamp { border-radius: 14px; }
+.sheet { border-radius: var(--r-card); }
+.auth-wrap { border-radius: 28px; overflow: hidden; }
+.cube span { border-radius: 16px; }
+
+.verify-note, .safety, .ext-status, .applicants, .apply-panel, .match-card, .stat, .rewrite, .form-box,
+.table-wrap, .photo-grid img, .video-thumb, .company-photo { border-radius: var(--r-box); }
+.msg { border-radius: 14px; }
+.warn-note { padding: 0.4rem 0.7rem; border-radius: 10px; background: rgba(184, 110, 0, 0.08); }
+.video-frame { border-radius: 14px; }
+.company-logo, .logo { border-radius: 14px; }
+pre { padding: 0.8rem; border-radius: 12px; background: var(--white); }
+
+/* ---- capsules: buttons, chips, badges, tabs ---- */
+.btn, .fchip, .tab, .chip, .badge, .level, .match-pill, .update-banner, .bell-count { border-radius: var(--r-pill); }
+.btn, .btn.small, .btn.danger { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+.btn { padding: 0.62rem 1.25rem; font-size: 0.88rem; font-weight: 700; border-color: var(--line-strong); }
+.btn.small { padding: 0.42rem 0.95rem; font-size: 0.8rem; }
+.btn:hover { border-color: var(--orange); box-shadow: 0 4px 14px rgba(255, 106, 26, 0.25); }
+.btn:active { transform: translateY(1px); box-shadow: none; }
+.btn.primary, .btn.primary-inline { clip-path: none; border-color: var(--orange); box-shadow: 0 6px 16px rgba(255, 106, 26, 0.35); color: #161616; }
+.btn.primary { font-size: 0.98rem; }
+.btn.danger { box-shadow: none; }
+.btn:disabled { box-shadow: none; transform: none; }
+.fchip { padding: 0.45rem 1rem; font-size: 0.8rem; font-weight: 700; border-color: var(--line-strong); box-shadow: none; }
+.fchip:hover { border-color: var(--orange); }
+.chip, .badge, .level, .match-pill { font-weight: 700; }
+.tabs { padding: 4px; gap: 4px; border-radius: var(--r-pill); border-color: var(--line-strong); }
+.tab { font-size: 0.9rem; }
+.tab + .tab { border-left: none; }
+
+/* ---- round buttons and icons ---- */
+.round-btn { border-radius: 50%; border-color: var(--line-strong); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18); }
+.round-btn:active { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
+.round-btn.save { border-color: var(--orange); box-shadow: 0 8px 20px rgba(255, 106, 26, 0.4); }
+.round-btn:disabled { box-shadow: none; }
+.theme-toggle, .bell-btn, .chat-fab, .avatar, .avatar-xl, .avatar-empty, .signal-icon { border-radius: 50%; }
+.theme-toggle, .bell-btn { border-color: var(--line-strong); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+.chat-fab { border-color: var(--orange); box-shadow: 0 8px 22px rgba(255, 106, 26, 0.45); }
+
+/* ---- inputs ---- */
+input, select, textarea { padding: 0.7rem 1.1rem; border-radius: var(--r-pill); }
+textarea { border-radius: 20px; }
+input[type="file"] { border-radius: 18px; }
+input[type="checkbox"] { border-radius: 4px; }
+input[type="radio"] { border-radius: 50%; }
+input:focus, select:focus, textarea:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255, 106, 26, 0.28); }
+.search { border-radius: var(--r-pill); overflow: hidden; }
+.search:focus-within { box-shadow: 0 0 0 3px rgba(255, 106, 26, 0.28); }
+
+/* ---- bars and charts ---- */
+.meter, .meter > div, .bar-track, .bar-fill, .funnel-track, .funnel-fill { border-radius: var(--r-pill); }
+.meter, .funnel-track { overflow: hidden; }
+.chart rect { rx: 3px; }
+
+/* ---- floating panels ---- */
+.chat-panel { border-radius: 22px; overflow: hidden; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25); }
+.chat-msg { border-radius: 16px; }
+.bell-panel { border-radius: 20px; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25); }
+
+/* ---- top menu on laptops: capsule links, active one filled ---- */
+@media (min-width: 820px) {
+  .nav { align-items: center; gap: 0.3rem; }
+  .nav-link { height: 38px; padding: 0 1.15rem; border-radius: var(--r-pill); font-size: 0.9rem; font-weight: 700; }
+  .nav-link.active { background: var(--orange); color: #161616; box-shadow: none; }
+  .nav-link:hover:not(.active) { background: rgba(255, 106, 26, 0.14); }
+}
+
+/* ---- bottom menu on phones: a floating capsule bar ---- */
+@media (max-width: 819px) {
+  .nav {
+    left: 12px;
+    right: 12px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    height: 62px;
+    padding: 5px;
+    gap: 4px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-pill);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  }
+  .nav-link { border-left: none; border-radius: var(--r-pill); font-size: 0.66rem; font-weight: 700; }
+  .nav-link.active { background: var(--orange); color: #161616; }
+  .chat-fab { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+  .chat-panel { bottom: calc(154px + env(safe-area-inset-bottom, 0px)); }
+}
