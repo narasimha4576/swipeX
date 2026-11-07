@@ -27,6 +27,7 @@ from app.routers import (
     account,
     monitoring,
     admin_system,
+    admin_analytics,
     admin_monitor,
     resume_ai,
     explore_web,
@@ -78,6 +79,7 @@ app.include_router(admin_monitor.router)
 app.include_router(account.router)
 app.include_router(monitoring.router)
 app.include_router(admin_system.router)
+app.include_router(admin_analytics.router)
 app.include_router(resume_ai.router)
 app.include_router(explore_web.router)
 app.include_router(autofill_ai.router)

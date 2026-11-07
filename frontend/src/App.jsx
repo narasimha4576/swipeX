@@ -25,6 +25,7 @@ import LegalFooter from "./pages/LegalFooter";
 const AdminUserDetail = lazyPage(() => import("./pages/AdminUserDetail"));
 const AdminMonitor = lazyPage(() => import("./pages/AdminMonitor"));
 const AdminSystem = lazyPage(() => import("./pages/AdminSystem"));
+const AdminAnalytics = lazyPage(() => import("./pages/AdminAnalytics"));
 const AdminUsers = lazyPage(() => import("./pages/AdminUsers"));
 const AdminCompanies = lazyPage(() => import("./pages/AdminCompanies"));
 import JobDetail from "./pages/JobDetail";
@@ -149,6 +150,7 @@ const TABS = {
     ["/admin/companies", "Companies", "companies"],
     ["/admin/monitor", "Monitor", "users"],
     ["/admin/system", "System", "users"],
+    ["/admin/analytics", "Analytics", "users"],
     ["/jobs", "Jobs", "jobs"],
   ],
 };
@@ -215,6 +217,7 @@ function Shell() {
           {user.role === "admin" && <Route path="/admin/users/:id" element={<AdminUserDetail />} />}
           {user.role === "admin" && <Route path="/admin/monitor" element={<AdminMonitor />} />}
           {user.role === "admin" && <Route path="/admin/system" element={<AdminSystem />} />}
+          {user.role === "admin" && <Route path="/admin/analytics" element={<AdminAnalytics />} />}
           <Route path="/account" element={<AccountPage />} />
           <Route path="*" element={<Navigate to={home} replace />} />
         </Routes>

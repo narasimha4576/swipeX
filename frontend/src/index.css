@@ -909,3 +909,19 @@ a.name:hover { text-decoration: underline; }
 .legal-page h2 { margin-top: 1.6rem; font-size: 1.15rem; }
 .legal-page ul { padding-left: 1.2rem; }
 .legal-page li { margin-bottom: 0.4rem; }
+
+/* ===== Analytics ===== */
+.chart { width: 100%; height: auto; color: var(--orange); }
+.chart text { font-size: 11px; fill: var(--muted); }
+.chart-grid { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+.two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.bar-row { display: flex; align-items: center; gap: 0.6rem; margin: 0.35rem 0; font-size: 0.85rem; }
+.bar-name { flex: 0 1 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-track { flex: 1; height: 10px; background: var(--line); }
+.bar-fill { display: block; height: 100%; background: var(--orange); }
+.bar-count { min-width: 2.2rem; margin-left: auto; text-align: right; font-family: var(--mono); }
+.funnel-row { display: grid; grid-template-columns: minmax(150px, 280px) 1fr 90px; gap: 0.8rem; align-items: center; margin: 0.5rem 0; font-size: 0.88rem; }
+.funnel-track { height: 22px; background: var(--line); }
+.funnel-fill { height: 100%; background: var(--orange); }
+.funnel-num { font-family: var(--mono); text-align: right; }
+@media (max-width: 640px) { .funnel-row { grid-template-columns: 1fr; gap: 0.2rem; } .funnel-num { text-align: left; } }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import api, { errorMessage } from "../api";
 import { fromServer } from "../time";
 
@@ -166,8 +166,8 @@ export default function AdminSystem() {
               </thead>
               <tbody>
                 {errors.map((e) => (
-                  <>
-                    <tr key={e.fingerprint} onClick={() => show(e.fingerprint)} style={{ cursor: "pointer" }}>
+                  <Fragment key={e.fingerprint}>
+                    <tr onClick={() => show(e.fingerprint)} style={{ cursor: "pointer" }}>
                       <td>{when(e.last_seen)}</td>
                       <td>{e.count}</td>
                       <td>{e.kind}</td>
@@ -192,7 +192,7 @@ export default function AdminSystem() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
