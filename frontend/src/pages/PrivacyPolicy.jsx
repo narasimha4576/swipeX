@@ -33,6 +33,11 @@ export default function PrivacyPolicy() {
           What you do: jobs you like or skip, jobs you apply to and their status, your saved searches and your
           notifications.
         </li>
+        <li>Recovery codes for resetting your password. They are stored only as one-way scrambles, and each works once.</li>
+        <li>
+          Feedback and problem reports you send: your message, the page you were on and a short description of your
+          browser. Your name and email are included only if you tick the box that allows contact, or type an email.
+        </li>
         <li>If you are a recruiter: company details, job postings and your place in a company team.</li>
       </ul>
       <p>
@@ -60,6 +65,10 @@ export default function PrivacyPolicy() {
           the join date) and simple counts such as how many resumes and applications you have. They do not see your
           profile contents, resumes or application details. Every time an administrator opens an account, it is written
           to a log.
+        </li>
+        <li>
+          <b>SwipeX administrators</b> also read the feedback and problem reports people send. They see your name and
+          email on a report only if you allowed contact.
         </li>
         <li>Job postings and company details are public by nature.</li>
       </ul>
@@ -91,6 +100,10 @@ export default function PrivacyPolicy() {
         <li>
           Job postings and the company record stay (closed) so other people keep their application history. They are
           no longer linked to you.
+        </li>
+        <li>
+          Feedback and problem reports are kept until the administrator deletes them. If you delete your account, your
+          reports stay but are no longer linked to you.
         </li>
         <li>If we keep backups, deleted data may remain in them for a limited time.</li>
       </ul>

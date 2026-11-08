@@ -20,6 +20,12 @@ import EducationSection from "./pages/EducationSection";
 const PublicProfile = lazyPage(() => import("./pages/PublicProfile"));
 const AccountPage = lazyPage(() => import("./pages/AccountPage"));
 const PrivacyPolicy = lazyPage(() => import("./pages/PrivacyPolicy"));
+const ForgotPassword = lazyPage(() => import("./pages/ForgotPassword"));
+const FeedbackPage = lazyPage(() => import("./pages/FeedbackPage"));
+const AdminFeedback = lazyPage(() => import("./pages/AdminFeedback"));
+import AuthLinks from "./pages/AuthLinks";
+import FeedbackLink from "./pages/FeedbackLink";
+import RecoveryNudge from "./pages/RecoveryNudge";
 const Terms = lazyPage(() => import("./pages/Terms"));
 import LegalFooter from "./pages/LegalFooter";
 const AdminUserDetail = lazyPage(() => import("./pages/AdminUserDetail"));
@@ -148,6 +154,7 @@ const TABS = {
   admin: [
     ["/admin/users", "Users", "users"],
     ["/admin/companies", "Companies", "companies"],
+    ["/admin/feedback", "Feedback", "users"],
     ["/admin/monitor", "Monitor", "users"],
     ["/admin/system", "System", "users"],
     ["/admin/analytics", "Analytics", "users"],
@@ -185,11 +192,13 @@ function Shell() {
         </nav>
 
         <div className="who">
+          <RecoveryNudge />
+          <FeedbackLink />
           <NotificationBell />
           <ThemeToggle />
           <NavLink className="name" to="/account" title="Account and privacy">{user.full_name}</NavLink>
           <span className={`badge ${user.role}`}>{user.role.replace("_", " ")}</span>
-          <Avatar key={user.id} user={user} />
+          <NavLink to="/account" title="Account and privacy"><Avatar key={user.id} user={user} /></NavLink>
           <button className="btn small" onClick={logout}>
             Log out
           </button>
@@ -219,6 +228,7 @@ function Shell() {
           {user.role === "admin" && <Route path="/admin/system" element={<AdminSystem />} />}
           {user.role === "admin" && <Route path="/admin/analytics" element={<AdminAnalytics />} />}
           <Route path="/account" element={<AccountPage />} />
+          {user.role === "admin" && <Route path="/admin/feedback" element={<AdminFeedback />} />}
           <Route path="*" element={<Navigate to={home} replace />} />
         </Routes>
       </main>
@@ -233,9 +243,11 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/login" element={<><AuthPage /><LegalFooter /></>} />
+          <Route path="/login" element={<><AuthPage /><AuthLinks /><LegalFooter /></>} />
           <Route path="/u/:slug" element={<><PublicProfile /><LegalFooter /></>} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/forgot" element={<ForgotPassword />} />
+          <Route path="/feedback" element={<FeedbackPage />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/*" element={<Shell />} />
         </Routes>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import api, { errorMessage } from "../api";
+import PasswordSection from "./PasswordSection";
+import RecoverySection from "./RecoverySection";
 import { useAuth } from "../authContext";
 
 export default function AccountPage() {
@@ -68,6 +70,9 @@ export default function AccountPage() {
           </Link>
         </p>
       </section>
+
+      <PasswordSection />
+      <RecoverySection />
 
       <section className="glass card">
         <h3>Download your data</h3>

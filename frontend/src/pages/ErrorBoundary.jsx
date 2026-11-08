@@ -36,6 +36,9 @@ export default class ErrorBoundary extends Component {
             <a className="btn small" href="/">
               Go to Home
             </a>
+            <a className="btn small" href={"/feedback?type=problem&from=" + encodeURIComponent(window.location.pathname)}>
+              Report this problem
+            </a>
           </div>
         </section>
       </div>

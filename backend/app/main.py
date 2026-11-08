@@ -25,6 +25,8 @@ from app.routers import (
     team,
     profile_extras,
     account,
+    password_tools,
+    feedback,
     monitoring,
     admin_system,
     admin_analytics,
@@ -77,6 +79,9 @@ app.include_router(profile_extras.router)
 app.include_router(profile_extras.public_router)
 app.include_router(admin_monitor.router)
 app.include_router(account.router)
+app.include_router(password_tools.router)
+app.include_router(feedback.router)
+app.include_router(feedback.admin_router)
 app.include_router(monitoring.router)
 app.include_router(admin_system.router)
 app.include_router(admin_analytics.router)
