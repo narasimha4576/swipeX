@@ -1,5 +1,5 @@
 """Checks a Postgres database before SwipeX is hosted on it.
-Usage:  python backend\check_hosting.py "<the DIRECT connection string>"
+Usage:  python backend/check_hosting.py "<the DIRECT connection string>"
 """
 import re
 import sys

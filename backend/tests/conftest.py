@@ -37,6 +37,7 @@ from app.security import hash_password  # noqa: E402
 
 if engine.url.database != TEST_DB_NAME:
     raise RuntimeError("Tests may only run on the test database. Stopping to protect your data.")
+Base.metadata.drop_all(engine)  # rebuilt every run, so new columns are never missing
 Base.metadata.create_all(engine)
 
 PASSWORD = "Passw0rd!123"
@@ -226,3 +227,7 @@ def empty_cache():
 
     clear_cache()
     yield
+
+def pytest_configure(config):
+    config.addinivalue_line("filterwarnings", "ignore::DeprecationWarning")
+    config.addinivalue_line("filterwarnings", "ignore:Using .httpx. with .starlette.testclient.*")

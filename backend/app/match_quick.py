@@ -5,7 +5,8 @@ from sqlalchemy import select
 
 from app.geo import detect_country
 from app.models import Application, Job, Profile, Resume, Swipe
-from app.resume_tools import read_pdf
+from app.resume_tools import read_pdf_bytes
+from app.storage import resume_bytes
 from app.routers.resumes import UPLOAD_DIR
 from app.skills import extract_skills
 
@@ -31,9 +32,9 @@ def resume_skill_set(db, user):
         return None
     text = resume.parsed_text or ""
     if not text:
-        path = UPLOAD_DIR / resume.file_path
-        if path.exists():
-            text, _pages = read_pdf(path)
+        content = resume_bytes(resume, UPLOAD_DIR)
+        if content is not None:
+            text, _pages = read_pdf_bytes(content)
             if text:
                 resume.parsed_text = text
                 db.commit()

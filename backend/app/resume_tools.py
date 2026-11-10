@@ -176,3 +176,25 @@ def match_job(resume_text: str, job_skills: list[str], job_title: str, job_descr
         "text_match_percent": round(similarity * 100),
         "tips": tips,
     }
+
+def read_pdf_bytes(content: bytes) -> tuple[str, int]:
+    import io
+
+    try:
+        reader = PdfReader(io.BytesIO(content))
+        pages = len(reader.pages)
+        text = "\n".join((page.extract_text() or "") for page in reader.pages[:6])
+    except Exception:
+        return "", 0
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text).strip()
+    return text[:MAX_CHARS], pages
+
+
+def page_count_bytes(content: bytes) -> int:
+    import io
+
+    try:
+        return len(PdfReader(io.BytesIO(content)).pages)
+    except Exception:
+        return 0

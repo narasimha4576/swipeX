@@ -161,5 +161,11 @@ def sync_all() -> dict:
         totals["alerts"] = check_saved_searches()
     except Exception as exc:
         print(f"  Saved search check failed: {exc}", flush=True)
+    try:
+        from app.importers.cleanup_jobs import cleanup_old_jobs
+
+        totals["old_jobs_removed"] = cleanup_old_jobs()
+    except Exception as exc:
+        print(f"  Old job cleanup failed: {exc}", flush=True)
     print(f"Job import finished: {totals}", flush=True)
     return totals

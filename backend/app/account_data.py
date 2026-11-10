@@ -22,6 +22,7 @@ from app.models import (
     SavedSearch,
     Swipe,
 )
+from app.storage import photo_bytes, resume_bytes
 from app.team_tools import owner_user_id
 
 README = """SwipeX - a copy of your data
@@ -60,7 +61,7 @@ def collect_data(db, user):
 
     profile = db.scalar(select(Profile).where(Profile.user_id == user.id))
     out["profile"] = (
-        row_dict(profile, skip=("id", "user_id", "photo_path", "public_slug")) if profile else None
+        row_dict(profile, skip=("id", "user_id", "photo_path", "photo_data", "public_slug")) if profile else None
     )
 
     for key, model in (("experiences", Experience), ("educations", Education), ("portfolio", PortfolioItem)):
@@ -148,14 +149,14 @@ def build_zip(db, user, upload_dir, photo_dir):
         bundle.writestr("data.json", json.dumps(jsonable_encoder(data), indent=2, ensure_ascii=False))
         bundle.writestr("README.txt", README)
         for resume in db.scalars(select(Resume).where(Resume.user_id == user.id).order_by(Resume.id)):
-            path = upload_dir / resume.file_path
-            if path.is_file():
-                bundle.write(path, f"resumes/{resume.id}-{safe_name(resume.version_name)}.pdf")
+            content = resume_bytes(resume, upload_dir)
+            if content is not None:
+                bundle.writestr(f"resumes/{resume.id}-{safe_name(resume.version_name)}.pdf", content)
         profile = db.scalar(select(Profile).where(Profile.user_id == user.id))
-        if profile and profile.photo_path and (photo_dir / profile.photo_path).is_file():
-            bundle.write(photo_dir / profile.photo_path, "photo.jpg")
+        photo = photo_bytes(profile, photo_dir)
+        if photo is not None:
+            bundle.writestr("photo.jpg", photo)
     return buffer.getvalue()
-
 
 def delete_account(db, user, upload_dir, photo_dir):
     """Erases the person's data. Companies and job postings stay (closed) so other people keep their history."""

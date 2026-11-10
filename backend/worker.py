@@ -1,6 +1,6 @@
 """The background worker: job imports and cleanup, as its own program.
 
-Run it with:   python worker.py        (or .\start-worker.ps1 from the project folder)
+Run it with:   python worker.py        (or ./start-worker.ps1 from the project folder)
 Then start the website with RUN_SCHEDULER_IN_API=false so only this program imports jobs.
 """
 import signal

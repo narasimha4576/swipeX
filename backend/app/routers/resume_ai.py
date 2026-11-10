@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.deps import get_db, require_roles
 from app.models import Company, Job, Resume, User
-from app.resume_tools import analyze_resume, match_job, page_count, read_pdf
+from app.resume_tools import analyze_resume, match_job, page_count_bytes, read_pdf_bytes
+from app.storage import resume_bytes
 from app.routers.resumes import UPLOAD_DIR
 
 router = APIRouter(tags=["resume-ai"])
@@ -40,16 +41,16 @@ def load_text(db: Session, user: User, resume_id: int):
     resume = db.get(Resume, resume_id)
     if resume is None or resume.user_id != user.id:
         raise HTTPException(status_code=404, detail="Resume not found")
-    path = UPLOAD_DIR / resume.file_path
-    if not path.exists():
+    content = resume_bytes(resume, UPLOAD_DIR)
+    if content is None:
         raise HTTPException(status_code=404, detail="The resume file is missing")
     text = resume.parsed_text or ""
     if not text:
-        text, _ = read_pdf(path)
+        text, _ = read_pdf_bytes(content)
         if text:
             resume.parsed_text = text
             db.commit()
-    return resume, text, page_count(path)
+    return resume, text, page_count_bytes(content)
 
 
 @router.get("/resumes/{resume_id}/analysis", response_model=ResumeAnalysisOut)

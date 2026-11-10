@@ -1,3 +1,4 @@
+from sqlalchemy import LargeBinary
 from datetime import datetime
 
 from sqlalchemy import (
@@ -40,6 +41,7 @@ class Profile(Base):
     skills: Mapped[list] = mapped_column(JSON, default=list)
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
     photo_path: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    photo_data: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True, deferred=True)
     is_public: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     public_slug: Mapped[str | None] = mapped_column(String(60), unique=True, index=True, nullable=True)
     phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
@@ -119,6 +121,7 @@ class Resume(Base):
     version_name: Mapped[str] = mapped_column(String(120))
     file_path: Mapped[str] = mapped_column(String(500))
     parsed_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    file_data: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True, deferred=True)
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 

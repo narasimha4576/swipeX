@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.deps import get_db, require_roles
 from app.models import Education, Experience, PortfolioItem, Profile, User
 from app.routers.resumes import UPLOAD_DIR
+from app.storage import photo_bytes
 from app.schemas import ExperienceOut, PortfolioOut
 
 router = APIRouter(prefix="/profile", tags=["profile-extras"])
@@ -98,11 +99,13 @@ async def upload_photo(
         (320, 320), Image.Resampling.LANCZOS
     )
     name = f"u{user.id}-{secrets.token_hex(8)}.jpg"
-    image.save(PHOTO_DIR / name, "JPEG", quality=85, optimize=True)
+    jpeg = io.BytesIO()
+    image.save(jpeg, "JPEG", quality=85, optimize=True)
 
     profile = ensure_profile(db, user)
     old = profile.photo_path
     profile.photo_path = name
+    profile.photo_data = jpeg.getvalue()
     db.commit()
     if old and PHOTO_NAME.match(old):
         (PHOTO_DIR / old).unlink(missing_ok=True)
@@ -114,6 +117,7 @@ def delete_photo(db: Session = Depends(get_db), user: User = Depends(seeker_only
     profile = ensure_profile(db, user)
     old = profile.photo_path
     profile.photo_path = None
+    profile.photo_data = None
     db.commit()
     if old and PHOTO_NAME.match(old):
         (PHOTO_DIR / old).unlink(missing_ok=True)
@@ -219,12 +223,14 @@ def delete_education(
 
 
 @public_router.get("/photos/{name}")
-def serve_photo(name: str):
-    path = PHOTO_DIR / name
-    if not PHOTO_NAME.match(name) or not path.is_file():
+def serve_photo(name: str, db: Session = Depends(get_db)):
+    if not PHOTO_NAME.match(name):
         raise HTTPException(status_code=404, detail="Not found")
-    return FileResponse(path, media_type="image/jpeg", headers={"Cache-Control": "public, max-age=86400"})
-
+    profile = db.scalar(select(Profile).where(Profile.photo_path == name))
+    data = photo_bytes(profile, PHOTO_DIR)
+    if data is None:
+        raise HTTPException(status_code=404, detail="Not found")
+    return Response(data, media_type="image/jpeg", headers={"Cache-Control": "public, max-age=86400"})
 
 class PublicProfileOut(BaseModel):
     full_name: str

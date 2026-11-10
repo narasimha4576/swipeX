@@ -17,7 +17,8 @@ from sqlalchemy.orm import Session
 
 from app.deps import get_db, require_roles
 from app.models import Application, Resume, User
-from app.resume_tools import read_pdf
+from app.resume_tools import read_pdf_bytes
+from app.storage import pdf_response, resume_bytes
 from app.upload_checks import validate_pdf
 from app.schemas import ResumeOut
 
@@ -77,13 +78,13 @@ def upload_resume(
 
     validate_pdf(content)
     filename = f"{uuid.uuid4().hex}.pdf"
-    (UPLOAD_DIR / filename).write_bytes(content)
-    parsed_text, _pages = read_pdf(UPLOAD_DIR / filename)
+    parsed_text, _pages = read_pdf_bytes(content)
 
     resume = Resume(
         user_id=user.id,
         version_name=name,
         file_path=filename,
+        file_data=content,
         parsed_text=parsed_text or None,
         is_default=(count == 0),
     )
@@ -100,10 +101,10 @@ def download_resume(
     user: User = Depends(seeker_only),
 ):
     resume = get_own_resume(db, user, resume_id)
-    path = UPLOAD_DIR / resume.file_path
-    if not path.exists():
+    content = resume_bytes(resume, UPLOAD_DIR)
+    if content is None:
         raise HTTPException(status_code=404, detail="File is missing on the server")
-    return FileResponse(path, media_type="application/pdf", filename=f"{resume.version_name}.pdf")
+    return pdf_response(content, resume.version_name)
 
 
 @router.patch("/{resume_id}/default", response_model=ResumeOut)

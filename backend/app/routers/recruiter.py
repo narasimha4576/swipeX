@@ -18,6 +18,7 @@ from app.models import (
 from app.routers.jobs import job_to_out
 from app.safety import check_text
 from app.team_tools import is_owner, my_company_id
+from app.storage import pdf_response, resume_bytes
 from app.notifications import notify_status_change
 from app.routers.resumes import UPLOAD_DIR
 from app.schemas import (
@@ -268,12 +269,10 @@ def applicant_resume(
     resume = db.get(Resume, application.resume_id) if application.resume_id else None
     if resume is None:
         raise HTTPException(status_code=404, detail="No resume attached")
-    path = UPLOAD_DIR / resume.file_path
-    if not path.exists():
+    content = resume_bytes(resume, UPLOAD_DIR)
+    if content is None:
         raise HTTPException(status_code=404, detail="Resume file is missing")
-    return FileResponse(
-        path, media_type="application/pdf", filename=f"{resume.version_name}.pdf"
-    )
+    return pdf_response(content, resume.version_name)
 
 @router.patch("/jobs/{job_id}", response_model=MyJobOut)
 def edit_job(
