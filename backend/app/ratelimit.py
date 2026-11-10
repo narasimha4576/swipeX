@@ -10,7 +10,7 @@ ALL_LIMITERS = []
 def client_ip(request) -> str:
     """The caller's IP. Only trusts X-Forwarded-For when TRUST_PROXY=true (behind your own proxy)."""
     if os.getenv("TRUST_PROXY", "").lower() == "true":
-        forwarded = request.headers.get("x-forwarded-for", "")
+        forwarded = request.headers.get("true-client-ip", "") or request.headers.get("cf-connecting-ip", "") or request.headers.get("x-forwarded-for", "")
         if forwarded:
             return forwarded.split(",")[-1].strip()
     return request.client.host if request.client else "unknown"
