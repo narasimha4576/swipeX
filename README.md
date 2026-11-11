@@ -5,6 +5,8 @@
   Swipe through jobs, save the ones you like, apply with the right resume, and track every application in one place.
 </p>
 
+<p align="center"><img src="https://github.com/narasimha4576/swipeX/actions/workflows/tests.yml/badge.svg" alt="Tests" /></p>
+
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python" />
   <img src="https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
