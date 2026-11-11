@@ -1,8 +1,8 @@
 <h1 align="center">SwipeX</h1>
 
 <p align="center">
-  <b>Swipe-based intelligent job discovery and career assistance platform</b><br/>
-  Swipe through jobs, save the ones you like, apply with the right resume, and track every application in one place.
+  <b>Swipe-based job discovery with real company checks, resume matching and one-click autofill</b><br/>
+  Live site: <a href="https://swipex.jobslist.workers.dev">swipex.jobslist.workers.dev</a>
 </p>
 
 <p align="center"><img src="https://github.com/narasimha4576/swipeX/actions/workflows/tests.yml/badge.svg" alt="Tests" /></p>
@@ -11,68 +11,57 @@
   <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python" />
   <img src="https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/React-Vite-61DAFB?logo=react&logoColor=black" alt="React" />
-  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker" />
-  <img src="https://img.shields.io/badge/Status-In%20development-orange" alt="Status" />
+  <img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Status-Live%20(beta%20prep)-orange" alt="Status" />
 </p>
-
----
-
-## Table of contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [How it works](#how-it-works)
-- [Database design](#database-design)
-- [Roles and permissions](#roles-and-permissions)
-- [API overview](#api-overview)
-- [Tech stack](#tech-stack)
-- [Project structure](#project-structure)
-- [Getting started](#getting-started)
-- [Configuration](#configuration)
-- [Design notes](#design-notes)
-- [Security](#security)
-- [Roadmap](#roadmap)
-- [Author](#author)
 
 ---
 
 ## Overview
 
-Finding a job usually means scrolling through long lists and filling the same forms again and again. **SwipeX** makes it feel like using a modern phone app:
+Job hunting means scrolling long lists, guessing which companies are real, and typing the same details into every form. SwipeX tackles all three:
 
-- **Job seekers** swipe through job cards, save the ones they like, and apply with the resume that fits best.
-- **Recruiters** create a company profile, post jobs, and see them go live instantly.
-- **Admins** manage users and keep the platform healthy.
+- **Job seekers** swipe through jobs, see how well their resume matches, check whether a company and posting look safe, and fill company application forms with a Chrome extension.
+- **Recruiters** set up a company (with team invites), post jobs and review applicants.
+- **Admins** run the platform while seeing only account basics and counts, never private profile content.
 
-The app has an iPhone-style glassmorphism design: a colourful gradient wallpaper, frosted glass cards, and a floating bottom tab bar.
+Jobs come from the official boards of real companies (Greenhouse, Lever, Ashby) plus clearly labelled third-party sources.
 
-> The sample companies and jobs in this project are made up. They exist only so the app has data to show during development.
+> SwipeX is a portfolio project. It runs on free hosting, so the server sleeps after 15 minutes without traffic and the first request can take about 30 seconds.
 
 ---
 
 ## Features
 
 ### Job seekers
-- [x] Sign up, log in, secure sessions with JWT
-- [x] **Discover**: swipe cards (right = save, left = skip, undo, keyboard arrows)
-- [x] **Jobs**: search, quick filters (MNC, Startup, New startup, Remote, Fresher-friendly, Low competition, Last 7 days, Internships), advanced filters (location, skill, minimum salary, experience level) and sorting
-- [x] **Competition level** on every job (Low, Medium, High) based on applicant count
-- [x] **Profile**: headline, location, experience, skill tags, about text, profile strength meter
-- [x] **Experience history** and **portfolio links**
-- [x] **Resumes**: upload up to 5 PDF versions, choose a default, view or delete
-- [x] **Apply** with a chosen resume and track status in **Applications** (Saved, Applied, Shortlisted, Interview, Rejected)
+- Swipe cards (right saves, left skips, undo, arrow keys), Liked and Skipped lists (skipped jobs clear after 15 days)
+- Home page with search and "Jobs for you" ranked by profile skills, resume skills, location, experience level and past likes
+- Jobs page with a split view on laptops, a country filter, saved searches and bell notifications for new matches
+- Resume upload (PDF checks, up to 5), resume health score, skills match % on job cards, ATS-style match with TF-IDF, and AI tips that may only reword facts already in the resume
+- Safety check on every job (fees, ID or OTP requests, WhatsApp-only contact, "guaranteed income" wording)
+- Company Trust Card: official board, website over HTTPS, domain age, public records (Wikidata) and hiring response stats
+- Company search for any company: jobs, news, photos, videos and an optional AI summary
+- Applications tracking: Saved, Applied, Shortlisted, Interview, Rejected
+- Autofill Chrome extension: fills Greenhouse, Lever and Ashby forms from saved details; never submits and never answers diversity questions; optional AI answers for extra questions
+- Profile with photo, education, experience, portfolio and an optional public page
+- Help chatbot, light and dark theme, feedback and problem reports
 
 ### Recruiters
-- [x] Create and edit a company profile (MNC, startup or newly founded startup)
-- [x] Post jobs (type, level, salary range, skills, remote option)
-- [x] Close and reopen postings
-- [x] Review applicants (profile, skills, experience, portfolio, resume PDF) and move them to shortlisted, interview or rejected
+- Company profile, verification request, job posting, editing, closing and reopening
+- Company teams with an invite code
+- Applicant review with filters, sorting, resume download and status changes (the applicant gets a notification)
+- Postings that ask candidates for money are blocked
 
 ### Admins
-- [x] See all users
-- [x] Enable or disable accounts (disabled users cannot log in)
+- Users, company verification and feedback
+- Monitor, System (health, errors, worker heartbeat) and Analytics (counts only)
+- Privacy by design: no profile contents, resumes or application details, and every account view is written to an activity log
+
+### Account and privacy
+- Sign-in with no email service: recovery codes for forgotten passwords, plus change password
+- Download all my data (ZIP) and delete my account
+- Privacy Policy and Terms pages
 
 ---
 
@@ -80,239 +69,24 @@ The app has an iPhone-style glassmorphism design: a colourful gradient wallpaper
 
 ```mermaid
 flowchart LR
-    subgraph Client["Browser"]
-        UI["React + Vite<br/>iPhone-style glass UI"]
-    end
-
-    subgraph Server["Backend (FastAPI)"]
-        API["REST API<br/>9 routers"]
-        AUTH["JWT auth<br/>and role checks"]
-        ORM["SQLAlchemy ORM"]
-    end
-
-    subgraph Docker["Docker Compose"]
-        PG[("PostgreSQL 16")]
-    end
-
-    FS[("Resume PDFs<br/>backend/uploads")]
-
-    UI -- "JSON over HTTP<br/>Bearer token" --> API
-    API --> AUTH
-    API --> ORM
-    ORM --> PG
-    API --> FS
+    U["Browser"] -->|HTTPS| CF["Cloudflare<br/>React + Vite website"]
+    CF -->|JSON + Bearer token| API["Render<br/>FastAPI (Docker)"]
+    API --> DB[("Neon<br/>PostgreSQL")]
+    GH["GitHub Actions<br/>importer, every 3 hours"] --> DB
+    GH -->|reads| B["Greenhouse, Lever, Ashby,<br/>RemoteOK, Arbeitnow"]
+    API -->|AI features| G["Groq"]
+    EXT["Chrome extension"] -->|fills| F["Company application forms"]
 ```
 
-The React app talks to the FastAPI backend with JSON requests. Every protected request carries a JWT token. The backend checks the token and the user's role, reads or writes PostgreSQL through SQLAlchemy, and stores uploaded resumes on disk.
-
----
-
-## How it works
-
-### Sign up and log in
-
-```mermaid
-sequenceDiagram
-    participant B as Browser
-    participant API as FastAPI
-    participant DB as PostgreSQL
-
-    B->>API: POST /auth/register (email, password, role)
-    API->>DB: Save user with argon2 password hash
-    B->>API: POST /auth/login (email, password)
-    API->>DB: Load user and verify password hash
-    API-->>B: JWT access token (expires in 60 minutes)
-    B->>API: GET /auth/me with Authorization header
-    API-->>B: Current user and role
-    Note over B,API: Every protected route checks the token and the role
-```
-
-### From a posted job to an application
-
-```mermaid
-sequenceDiagram
-    actor R as Recruiter
-    actor S as Job seeker
-    participant App as SwipeX
-
-    R->>App: Create company profile
-    R->>App: Post a job
-    App-->>S: Job appears in Jobs and Discover
-    S->>App: Swipe right (save)
-    S->>App: Apply with a chosen resume
-    App-->>App: Applicant count goes up
-    App-->>R: Applicants with profile and resume
-    R->>App: Shortlist, interview or reject
-    App-->>S: New status shows in Applications
-```
-
-### Swiping
-
-```mermaid
-flowchart TD
-    A["Deck: active jobs you have not swiped yet"] --> B{"Swipe"}
-    B -- "Right" --> C["Saved application created"]
-    B -- "Left" --> D["Skipped, never shown again"]
-    C --> E["Applications tab: Saved"]
-    E --> F["Apply with a resume"]
-    E --> G["Remove (counts as skipped)"]
-    F --> H["Applications tab: Applied"]
-    B -. "Undo" .-> A
-```
-
-### Application status
-
-```mermaid
-stateDiagram-v2
-    [*] --> Saved: swipe right
-    Saved --> Applied: apply with resume
-    Saved --> [*]: remove
-    Applied --> Shortlisted
-    Applied --> Rejected
-    Shortlisted --> Interview
-    Shortlisted --> Rejected
-    Interview --> Rejected
-```
-
-The job seeker moves a job from Saved to Applied. The later steps (Shortlisted, Interview, Rejected) are decided by the recruiter and are shown to the job seeker in the Applications tab.
-
----
-
-## Database design
-
-```mermaid
-erDiagram
-    USERS ||--o| PROFILES : "has one"
-    USERS ||--o{ EXPERIENCES : lists
-    USERS ||--o{ PORTFOLIO_ITEMS : shares
-    USERS ||--o{ RESUMES : uploads
-    USERS ||--o{ SWIPES : makes
-    USERS ||--o{ APPLICATIONS : submits
-    USERS ||--o| RECRUITER_PROFILES : "recruiter link"
-    COMPANIES ||--o{ RECRUITER_PROFILES : "belongs to"
-    COMPANIES ||--o{ JOBS : posts
-    JOBS ||--o{ SWIPES : receives
-    JOBS ||--o{ APPLICATIONS : receives
-    RESUMES ||--o{ APPLICATIONS : "used in"
-
-    USERS {
-        int id PK
-        string email UK
-        string password_hash
-        string full_name
-        string role "job_seeker, recruiter or admin"
-        bool is_active
-    }
-    PROFILES {
-        int id PK
-        int user_id FK
-        string headline
-        string location
-        float experience_years
-        json skills
-        text bio
-    }
-    EXPERIENCES {
-        int id PK
-        int user_id FK
-        string company
-        string title
-        int start_year
-        int end_year "empty means current"
-    }
-    PORTFOLIO_ITEMS {
-        int id PK
-        int user_id FK
-        string title
-        string url
-    }
-    RESUMES {
-        int id PK
-        int user_id FK
-        string version_name
-        string file_path
-        bool is_default
-    }
-    COMPANIES {
-        int id PK
-        string name UK
-        string company_type "mnc, startup or new_startup"
-        string location
-        int founded_year
-    }
-    RECRUITER_PROFILES {
-        int id PK
-        int user_id FK
-        int company_id FK
-    }
-    JOBS {
-        int id PK
-        int company_id FK
-        int posted_by FK
-        string title
-        text description
-        string job_type "full_time or internship"
-        string experience_level
-        float salary_min_lpa
-        float salary_max_lpa
-        json skills
-        int applicant_count
-        bool is_active
-    }
-    SWIPES {
-        int id PK
-        int user_id FK
-        int job_id FK
-        string direction "left or right"
-    }
-    APPLICATIONS {
-        int id PK
-        int user_id FK
-        int job_id FK
-        int resume_id FK
-        string status "saved, applied, shortlisted, interview or rejected"
-        float ats_score "planned"
-    }
-```
-
-One swipe and one application are allowed per user and job, so nobody can swipe or apply to the same job twice.
-
----
-
-## Roles and permissions
-
-| Action | Job seeker | Recruiter | Admin |
-|---|:---:|:---:|:---:|
-| Browse, search and filter jobs | Yes | Yes | Yes |
-| Swipe, save and apply | Yes | No | No |
-| Manage profile, experience, portfolio and resumes | Yes | No | No |
-| Create a company and post or close jobs | No | Yes | No |
-| Review applicants and update their status | No | Yes | No |
-| List users and enable or disable accounts | No | No | Yes |
-
-Only job seekers and recruiters can sign up on their own. The first admin is created with a script.
-
----
-
-## API overview
-
-Interactive API docs are available at `http://127.0.0.1:8000/docs` while the backend is running.
-
-| Area | Endpoints |
+| Part | Where it runs |
 |---|---|
-| Health | `GET /health`, `GET /health/db` |
-| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me` |
-| Admin | `GET /admin/users`, `PATCH /admin/users/{id}/active` |
-| Profile | `GET /profile/me`, `PUT /profile/me` |
-| Experience | `GET /profile/experiences`, `POST /profile/experiences`, `DELETE /profile/experiences/{id}` |
-| Portfolio | `GET /profile/portfolio`, `POST /profile/portfolio`, `DELETE /profile/portfolio/{id}` |
-| Resumes | `GET /resumes`, `POST /resumes`, `GET /resumes/{id}/file`, `PATCH /resumes/{id}/default`, `DELETE /resumes/{id}` |
-| Jobs | `GET /jobs` (search, filters, sort, pages), `GET /jobs/{id}`, `GET /companies` |
-| Swipes | `GET /swipes/deck`, `POST /swipes`, `DELETE /swipes/{job_id}` (undo) |
-| Applications | `GET /applications`, `POST /applications/apply`, `DELETE /applications/{id}` (saved only) |
-| Recruiter | `GET /recruiter/company`, `PUT /recruiter/company`, `GET /recruiter/jobs`, `POST /recruiter/jobs`, `PATCH /recruiter/jobs/{id}/active`, `GET /recruiter/jobs/{id}/applicants`, `PATCH /recruiter/applications/{id}/status`, `GET /recruiter/applications/{id}/resume` |
+| Website | Cloudflare (free) |
+| API | Render free plan (Docker, Singapore) |
+| Database | Neon free plan (Singapore). Resumes and photos are stored here too |
+| Job importer | GitHub Actions, every 3 hours |
+| Uptime | Health check at `/health` |
 
-`GET /jobs` filters: `q`, `company_type`, `job_type`, `experience_level`, `remote`, `location`, `skill`, `min_salary`, `max_age_days`, `fresher_friendly`, `low_competition`, `sort`, `page`, `page_size`.
+Notes on the free stack: Render sleeps after 15 minutes, Neon sleeps after 5 and has a monthly compute limit, so the importer runs every 3 hours and keep-alive pings use `/health`, which does not wake the database.
 
 ---
 
@@ -320,12 +94,144 @@ Interactive API docs are available at `http://127.0.0.1:8000/docs` while the bac
 
 | Layer | Technology |
 |---|---|
-| Frontend | React (Vite), React Router, Axios, Framer Motion, plain CSS |
-| Backend | Python 3.12, FastAPI, SQLAlchemy 2, Pydantic v2 |
-| Auth | JWT (PyJWT), argon2 password hashing (pwdlib) |
-| Database | PostgreSQL 16 in Docker |
-| Files | Resume PDFs stored in `backend/uploads` (not in Git) |
-| Tooling | Docker Compose, Git and GitHub, PowerShell start scripts |
+| Frontend | React (Vite), React Router, Axios, Framer Motion, plain CSS (soft capsule theme) |
+| Backend | Python 3.12, FastAPI, SQLAlchemy 2, Alembic, Pydantic v2, APScheduler |
+| Auth | JWT (PyJWT), argon2 hashing (pwdlib), recovery codes, rate limits |
+| Data | PostgreSQL 16 locally, Neon in production |
+| AI | Groq through one OpenAI-compatible helper (`app/ai.py`) |
+| Resume and matching | pypdf, scikit-learn (TF-IDF), a shared skill finder (`app/skills.py`) |
+| Extension | Chrome Manifest V3 |
+| Quality | pytest (254 tests), ESLint, GitHub Actions CI |
+| Delivery | Docker, Docker Compose, Cloudflare, Render, Neon, GitHub Actions |
+
+---
+
+## Build log
+
+SwipeX was built one day at a time.
+
+| Days | What was built |
+|---|---|
+| 1 to 3 | Repo, FastAPI, React, PostgreSQL in Docker, the first tables |
+| 4 to 6 | Sign-up, login with JWT, roles, admin user management |
+| 7 to 8 | Job seeker profile, experience and portfolio |
+| 9 to 10 | Sample jobs, job list, search, filters, competition level |
+| 11 | Swipe cards, save, skip and undo |
+| 12 to 14 | Recruiter company and job posting, resumes and applying, applicant review |
+| 15 | Alembic migrations, company verification, verified-only jobs |
+| 16 | Live job import from official Greenhouse boards |
+| 17 | Company Trust Card (Wikidata, HTTPS, domain age, hiring stats) |
+| 18 | Full job page, light and dark theme |
+| 19 | Application details and review-before-apply |
+| 20 | Autofill Chrome extension |
+| 21 | Lever, Ashby and Adzuna sources, internships, safety check, scam blocking |
+| 22 to 23 | Company search with news and AI summary, help chatbot, AI autofill answers |
+| 24 | Home page, split-view Jobs, worldwide jobs, third-party sources |
+| 25 to 26 | Resume reading and health check, match %, ranked "Jobs for you", AI resume tips |
+| 27 to 28 | Smarter recommendations, saved searches, bell notifications |
+| 30 | Company teams, job editing, applicant filters |
+| 31 | Photo, education, public profile, privacy-first admin view |
+| 32 to 33 | Automated tests for every area |
+| 34 | Rate limits, PDF checks, security headers, CORS |
+| 35 to 36 | Download and delete my data, Privacy Policy and Terms, recovery codes, feedback |
+| 37 | Error tracking, health checks, worker heartbeat, System page |
+| 38 | Admin analytics (counts only) |
+| 39 | Docker production setup |
+| 40 | Free hosting chosen: Neon, Render, Cloudflare, GitHub Actions |
+| 41 | Files stored in the database, old-job cleanup, migration 0013, 254 tests passing |
+| 42 | Backend live on Render, real client IP for rate limits |
+| 43 | Hourly-then-3-hourly job import on GitHub Actions, lock fix for Neon |
+| 44 | Website live on Cloudflare, CORS, API address |
+| 45 | Hosting and HTTPS added to the Privacy Policy |
+| 46 | CI: backend tests, undefined-name check, lint and build on every push |
+
+Email alerts (a planned Day 29) were dropped on purpose: notifications stay in the app, and no email service means less personal data.
+
+---
+
+## Roadmap
+
+**Next**
+- [ ] Day 47: package the autofill extension for the live site
+- [ ] Day 48: backups, keep-alive and uptime alerts
+- [ ] Days 49 to 50: beta with 10 to 20 users
+- [ ] Day 51: legal check of job-source terms
+- [ ] Days 52 to 53: landing page and demo
+- [ ] Day 54: final review
+
+**Later**
+- [ ] LinkedIn-style features (feed, connections)
+- [ ] Play Store app
+
+---
+
+## Security and privacy
+
+- Passwords are stored only as argon2 hashes. Recovery codes are stored as keyed one-way hashes and each works once
+- Login, sign-up, recovery and feedback have rate limits. The real client IP is read behind Render's proxy
+- Role checks on every route, and users only reach their own data
+- Uploaded PDFs are checked by content: no scripts, no password locks, at most 10 pages and 5 MB
+- Security headers on the API and the website, strict CORS, API docs hidden in production
+- Admins see only account basics and counts, and every account view is logged
+- Error reports hide emails, tokens and long numbers
+- `.env` files and uploads are ignored by Git
+
+---
+
+## Getting started (local)
+
+**You need:** Git, Python 3.12 or newer, Node.js (LTS) and Docker Desktop. The commands are for Windows PowerShell.
+
+```powershell
+git clone https://github.com/narasimha4576/swipeX.git
+cd swipeX
+docker compose up -d
+
+cd backend
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Copy-Item .env.example .env
+```
+
+Open `backend/.env`, replace `SECRET_KEY` with a long random string (`python -c "import secrets; print(secrets.token_hex(32))"`), then:
+
+```powershell
+alembic upgrade head
+python create_admin.py
+uvicorn app.main:app --reload
+```
+
+In a second terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5173. Shortcuts once everything is installed: `.\start-backend.ps1` and `.\start-frontend.ps1`.
+
+Run the tests from the `backend` folder:
+
+```powershell
+cd backend
+pytest
+```
+
+### Configuration
+
+| Variable | Meaning |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `SECRET_KEY` | Secret for login tokens (32 characters or more) |
+| `APP_ENV` | `production` hides API docs and enforces strict settings |
+| `CORS_ORIGINS` | Website address allowed to call the API |
+| `TRUST_PROXY` | `true` behind Render, so real client IPs are used |
+| `IMPORT_ENABLED`, `RUN_SCHEDULER_IN_API` | Switch the importer on the API on or off |
+| `AI_BASE_URL`, `AI_MODEL`, `AI_API_KEY` | Any OpenAI-compatible AI service (Groq by default) |
+| `JOB_RETENTION_DAYS`, `SKIP_RETENTION_DAYS` | How long old jobs and skipped jobs are kept |
+| `VITE_API_URL` | API address used by the website build |
 
 ---
 
@@ -335,173 +241,27 @@ Interactive API docs are available at `http://127.0.0.1:8000/docs` while the bac
 swipeX/
 |-- backend/
 |   |-- app/
-|   |   |-- main.py            App setup, CORS, routers
-|   |   |-- database.py        Database connection
-|   |   |-- models.py          Database tables
-|   |   |-- schemas.py         Request and response rules
-|   |   |-- security.py        Password hashing and JWT
-|   |   |-- deps.py            Current user and role checks
-|   |   `-- routers/
-|   |       |-- auth.py            Sign up, log in, current user
-|   |       |-- admin.py           User management
-|   |       |-- profile.py         Job seeker profile
-|   |       |-- profile_items.py   Experience and portfolio
-|   |       |-- resumes.py         Resume upload and files
-|   |       |-- jobs.py            Job list, search, filters, companies
-|   |       |-- swipes.py          Swipe deck, save, skip, undo
-|   |       |-- applications.py    Apply and track applications
-|   |       `-- recruiter.py       Company and job postings
-|   |-- create_admin.py        Create or reset an admin account
-|   |-- seed_jobs.py           Sample companies and jobs
-|   |-- requirements.txt
-|   `-- .env.example
+|   |   |-- main.py, models.py, schemas.py, security.py, deps.py
+|   |   |-- routers/        auth, jobs, swipes, applications, recruiter, team,
+|   |   |                   profile, resumes, autofill, explore, admin_*, feedback ...
+|   |   |-- importers/      greenhouse, lever, ashby, adzuna, third-party, scheduler
+|   |   |-- trust/          Wikidata, domain and website checks, trust card
+|   |   `-- safety.py, skills.py, resume_tools.py, ai.py, match_quick.py ...
+|   |-- alembic/            database migrations (0001 to 0013)
+|   |-- tests/              254 pytest tests
+|   `-- run_scheduled.py    one importer run for GitHub Actions
 |-- frontend/
-|   `-- src/
-|       |-- main.jsx, App.jsx, api.js, auth.jsx, jobUtils.js, index.css
-|       `-- pages/
-|           |-- AuthPage.jsx          Log in and sign up
-|           |-- Discover.jsx          Swipe cards
-|           |-- Jobs.jsx              Search and filters
-|           |-- Applications.jsx      Application tracking
-|           |-- Profile.jsx, ResumeSection.jsx,
-|           |   ExperienceSection.jsx, PortfolioSection.jsx
-|           |-- Workspace.jsx         Recruiter workspace
-|           |-- MyPostings.jsx        Recruiter job list
-|           |-- ApplicantsPanel.jsx   Review applicants
-|           `-- AdminUsers.jsx        Admin users table
-|-- docs/
-|   `-- schema.md
-|-- compose.yml                PostgreSQL container
-|-- start-backend.ps1          Starts the database and the API
-|-- start-frontend.ps1         Starts the website
-`-- README.md
+|   |-- src/                React pages, styles, helpers
+|   `-- wrangler.jsonc      Cloudflare deployment settings
+|-- extension/              SwipeX Autofill (Chrome, Manifest V3)
+|-- .github/workflows/      tests.yml (CI), import.yml (job importer)
+|-- docker-compose.prod.yml, compose.yml, start-*.ps1, dc.ps1
+`-- docs/schema.md          database diagram
 ```
-
----
-
-## Getting started
-
-**You need:** Git, Python 3.12 or newer, Node.js (LTS) and Docker Desktop.
-
-The commands below are for Windows PowerShell. On macOS or Linux, use `source .venv/bin/activate` instead of the activate line, and `cp` instead of `Copy-Item`.
-
-### 1. Get the code and start the database
-```powershell
-git clone https://github.com/narasimha4576/swipeX.git
-cd swipeX
-docker compose up -d
-```
-
-### 2. Set up the backend
-```powershell
-cd backend
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-Copy-Item .env.example .env
-```
-Open `backend/.env` and replace the `SECRET_KEY` placeholder with a long random string. You can generate one with:
-```powershell
-python -c "import secrets; print(secrets.token_hex(32))"
-```
-Then add sample data, create your first admin, and start the API:
-```powershell
-python seed_jobs.py
-python create_admin.py
-uvicorn app.main:app --reload
-```
-
-### 3. Start the frontend (in a new terminal)
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-Open **http://localhost:5173**, then sign up as a job seeker or a recruiter.
-
-### Shortcut
-Once everything is installed, two commands from the project folder start everything:
-```powershell
-.\start-backend.ps1
-.\start-frontend.ps1
-```
-Run each one in its own terminal. Docker Desktop must be running first.
-
----
-
-## Configuration
-
-Backend settings live in `backend/.env` (copy them from `backend/.env.example`):
-
-| Variable | Meaning | Example |
-|---|---|---|
-| `DATABASE_URL` | Connection string for PostgreSQL | `postgresql+psycopg://swipex:swipex_pass@localhost:5433/swipex` |
-| `SECRET_KEY` | Secret used to sign login tokens | a long random string |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | How long a login token lasts | `60` |
-
-The frontend uses `http://127.0.0.1:8000` as the API address. To change it, set `VITE_API_URL`.
-
-The database listens on port **5433** on your machine, so it does not clash with a PostgreSQL that may already use 5432.
-
----
-
-## Design notes
-
-**Look and feel.** iPhone-style glassmorphism: a slowly moving gradient wallpaper, frosted glass cards, a floating bottom tab bar with icons, large bold page titles, and company logo tiles on job cards.
-
-**Competition level.** A simple rule based on the number of applicants:
-
-| Applicants | Level |
-|---|---|
-| Fewer than 60 | Low |
-| 60 to 199 | Medium |
-| 200 or more | High |
-
-**Swipe meaning.** Swipe right saves a job (it is added to Applications as "Saved"). Swipe left skips it. Applying is a separate, deliberate step where you choose a resume.
-
----
-
-## Security
-
-- Passwords are never stored. Only an **argon2 hash** is saved.
-- Login tokens are **JWTs that expire** (60 minutes by default) and are signed with a secret from `.env`.
-- Every protected route checks the **role**. Users can only read or change **their own** data (profile, resumes, swipes, applications, postings).
-- Login errors use the same message for a wrong email and a wrong password.
-- Uploaded files must be **real PDFs** (checked by content, not only by name) and at most **5 MB**.
-- `.env` files and `backend/uploads/` are **ignored by Git**.
-- Disabled accounts cannot log in, and their old tokens stop working.
-
----
-
-## Roadmap
-
-**Done**
-- [x] Project setup, Docker PostgreSQL, SQLAlchemy models
-- [x] Authentication, roles, admin user management
-- [x] Job seeker profile, experience, portfolio and resume upload
-- [x] Jobs list with search, filters, sorting and competition level
-- [x] Swipe discovery with save, skip and undo
-- [x] Apply with a resume and application tracking
-- [x] Recruiter company profile and job posting
-- [x] iPhone-style glassmorphism interface
-- [x] Recruiters review applicants (shortlist, interview, reject)
-
-**In progress**
-- [ ] Resume parsing and ATS scoring
-
-**Next**
-- [ ] Application timeline and small clean-ups (apply and save buttons on the Jobs list, company pages)
-- [ ] Missing skills and keywords, with AI improvement suggestions
-- [ ] Personalised recommendations and match percentages
-- [ ] Notifications (new jobs, status changes)
-- [ ] Analytics dashboards (applications, resume performance, skill gaps)
-- [ ] Company and startup pages
-- [ ] Import real jobs from public job APIs with "apply" links
-- [ ] Automated tests, GitHub Actions CI, cloud deployment with Docker
 
 ---
 
 ## Author
 
-Built by **Narasimha** as a hands-on full-stack and AI project.
+Built by **Narasimha** (B.Tech AI/ML, Bengaluru) as a hands-on full-stack and AI project.
 GitHub: [@narasimha4576](https://github.com/narasimha4576)
