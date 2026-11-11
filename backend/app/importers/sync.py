@@ -61,6 +61,7 @@ def sync_board(db, client: httpx.Client, module, board: dict) -> dict:
     started = now_utc()
     seen: set[str] = set()
     created = updated = closed = 0
+    existing = {j.external_id: j for j in db.scalars(select(Job).where(Job.source == module.SOURCE, Job.company_id == company.id))}
 
     for raw in raw_jobs:
         if len(seen) >= MAX_JOBS_PER_COMPANY:
@@ -72,9 +73,7 @@ def sync_board(db, client: httpx.Client, module, board: dict) -> dict:
         posted = fields.pop("created_at", None)
         seen.add(external_id)
 
-        job = db.scalar(
-            select(Job).where(Job.source == module.SOURCE, Job.external_id == external_id)
-        )
+        job = existing.get(external_id)
         if job is None:
             extra = {"created_at": posted} if posted else {}
             db.add(
