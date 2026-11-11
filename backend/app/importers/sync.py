@@ -91,7 +91,8 @@ def sync_board(db, client: httpx.Client, module, board: dict) -> dict:
             created += 1
         else:
             for key, value in fields.items():
-                setattr(job, key, value)
+                if getattr(job, key) != value:
+                    setattr(job, key, value)
             job.company_id = company.id
             job.is_active = True
             job.last_seen_at = started
