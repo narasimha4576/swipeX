@@ -10,7 +10,8 @@ IMPORT_LOCK_ID = 727001
 @contextmanager
 def exclusive(lock_id):
     """Yields True if this process got the lock, False if another process already holds it."""
-    conn = engine.connect()
+    # AUTOCOMMIT: no transaction stays open, so Neon never ends the connection as "idle in transaction".
+    conn = engine.connect().execution_options(isolation_level="AUTOCOMMIT")
     got = False
     try:
         got = bool(conn.execute(text("SELECT pg_try_advisory_lock(:k)"), {"k": lock_id}).scalar())
@@ -18,9 +19,15 @@ def exclusive(lock_id):
             yield got
         finally:
             if got:
-                conn.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": lock_id})
+                try:
+                    conn.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": lock_id})
+                except Exception:
+                    pass  # a closed connection releases the lock by itself
     finally:
-        conn.close()
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 def run_exclusive(lock_id, work):
