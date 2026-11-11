@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime, timezone
 
 from sqlalchemy import select
@@ -7,7 +8,7 @@ from sqlalchemy.dialects.postgresql import insert
 from app.database import SessionLocal
 from app.models import SystemStatus
 
-WORKER_FRESH_SECONDS = 180
+WORKER_FRESH_SECONDS = int(os.getenv("WORKER_FRESH_SECONDS", "180"))
 
 
 def now_utc():
