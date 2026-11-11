@@ -87,6 +87,11 @@ export default function PrivacyPolicy() {
           If switched on, company searches send only the company name to Wikidata, a web search service and YouTube.
         </li>
         <li>Job listings come from public job-board services. We do not send your information to them.</li>
+        <li>
+          <b>Hosting services</b> run SwipeX: Cloudflare delivers the website, Render runs the server and Neon stores the
+          database, including your data and uploaded files. They handle your information only to keep SwipeX running. The
+          server and database are in Singapore, so your information is stored outside India.
+        </li>
       </ul>
 
       <h2>5. How long we keep it</h2>
@@ -116,7 +121,7 @@ export default function PrivacyPolicy() {
 
       <h2>7. Security</h2>
       <p>
-        We protect your information with hashed passwords, limits on sign-in attempts, checks on uploaded files and
+        All traffic between your browser and SwipeX is encrypted with HTTPS. We protect your information with hashed passwords, limits on sign-in attempts, checks on uploaded files and
         strict rules about who can open what. No website is perfectly secure, so please use a strong password that you
         do not use anywhere else.
       </p>
