@@ -232,7 +232,7 @@ export default function ApplyReview() {
         {extension === true && <div className="ext-status on">SwipeX Autofill extension detected.</div>}
         {extension === false && (
           <div className="ext-status off">
-            SwipeX Autofill extension not detected. Install it to fill forms automatically, or open
+            SwipeX Autofill extension not detected. <a className="link" href="/swipex-autofill.zip">Download it</a>, unzip it, then in Chrome open chrome://extensions, switch on Developer mode and choose Load unpacked. Or open
             the company page and fill it yourself.
           </div>
         )}

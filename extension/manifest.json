@@ -1,14 +1,23 @@
 {
   "manifest_version": 3,
   "name": "SwipeX Autofill",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fills job application forms with your SwipeX details. You always review and submit yourself.",
   "permissions": ["storage"],
-  "host_permissions": ["http://127.0.0.1:8000/*", "http://localhost:8000/*"],
+  "host_permissions": [
+    "https://swipex-jrem.onrender.com/*",
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*"
+  ],
+  "icons": { "48": "icons/icon48.png", "128": "icons/icon128.png" },
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {
-      "matches": ["http://localhost:5173/*", "http://127.0.0.1:5173/*"],
+      "matches": [
+        "https://swipex.jobslist.workers.dev/*",
+        "http://localhost:5173/*",
+        "http://127.0.0.1:5173/*"
+      ],
       "js": ["bridge.js"],
       "run_at": "document_start"
     },
@@ -18,6 +27,7 @@
         "https://jobs.lever.co/*",
         "https://jobs.eu.lever.co/*",
         "https://jobs.ashbyhq.com/*",
+        "https://swipex.jobslist.workers.dev/autofill-test.html*",
         "http://localhost:5173/autofill-test.html*",
         "http://127.0.0.1:5173/autofill-test.html*"
       ],

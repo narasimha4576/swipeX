@@ -59,7 +59,7 @@ async function aiAnswer(message, sender) {
   const entry = stored[storageKey(tabId)];
   const ai = entry && entry.payload && entry.payload.ai;
   if (!ai || !ai.token || !ai.api) return { ok: false, error: "AI answers are switched off" };
-  if (!/^http:\/\/(127\.0\.0\.1|localhost):8000$/.test(ai.api)) {
+  if (!/^(http:\/\/(127\.0\.0\.1|localhost):8000|https:\/\/swipex-jrem\.onrender\.com)$/.test(ai.api)) {
     return { ok: false, error: "Unknown SwipeX address" };
   }
   try {
