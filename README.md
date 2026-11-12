@@ -5,7 +5,8 @@
   Live site: <a href="https://swipex.jobslist.workers.dev">swipex.jobslist.workers.dev</a>
 </p>
 
-<p align="center"><img src="https://github.com/narasimha4576/swipeX/actions/workflows/tests.yml/badge.svg" alt="Tests" /></p>
+<p align="center"><img src="https://github.com/narasimha4576/swipeX/actions/workflows/tests.yml/badge.svg" alt="Tests" />
+  <img src="https://github.com/narasimha4576/swipeX/actions/workflows/keepalive.yml/badge.svg" alt="Uptime check" /></p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python" />
