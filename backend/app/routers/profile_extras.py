@@ -7,6 +7,7 @@ from fastapi.responses import FileResponse
 from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from sqlalchemy import func, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 from app.deps import get_db, require_roles
@@ -33,10 +34,9 @@ Image.MAX_IMAGE_PIXELS = 30_000_000
 def ensure_profile(db: Session, user: User) -> Profile:
     profile = db.scalar(select(Profile).where(Profile.user_id == user.id))
     if profile is None:
-        profile = Profile(user_id=user.id, skills=[])
-        db.add(profile)
+        db.execute(pg_insert(Profile).values(user_id=user.id, skills=[]).on_conflict_do_nothing(index_elements=["user_id"]))
         db.commit()
-        db.refresh(profile)
+        profile = db.scalar(select(Profile).where(Profile.user_id == user.id))
     return profile
 
 
