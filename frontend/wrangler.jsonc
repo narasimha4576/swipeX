@@ -1,8 +1,13 @@
 {
   "name": "swipex",
+  "main": "./worker.js",
   "compatibility_date": "2026-11-11",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application"
+  },
+  "triggers": {
+    "crons": ["*/10 0-18 * * *"]
   }
 }
