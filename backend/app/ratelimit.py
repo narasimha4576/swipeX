@@ -83,4 +83,4 @@ login_by_account = RateLimiter(
 login_by_ip = RateLimiter(
     30, 15 * 60, "Too many failed sign-in attempts from this network. Please wait a few minutes and try again."
 )
-register_by_ip = RateLimiter(10, 60 * 60, "Too many accounts were created from this network. Please try again later.")
+register_by_ip = RateLimiter(int(os.getenv("REGISTER_LIMIT_PER_HOUR", "10")), 60 * 60, "Too many accounts were created from this network. Please try again later.")
