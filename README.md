@@ -325,7 +325,7 @@ One swipe and one application are allowed per user and job.
 | Jobs | Greenhouse, Lever, Ashby, RemoteOK, Arbeitnow, Adzuna |
 | Extension | Chrome Manifest V3 |
 | Quality | pytest (254 tests), ESLint, pyflakes, GitHub Actions CI |
-| Packaging and hosting | Docker, Docker Compose, nginx locally. Cloudflare, Render, Neon and GitHub Actions when live |
+| Packaging and hosting | Docker, Docker Compose, nginx locally. Cloudflare, Render, Neon and GitHub Actions when live. Docker images are published to GitHub Packages on version tags |
 
 ---
 
@@ -365,8 +365,8 @@ SwipeX was built one day at a time.
 | 42 | API live on Render, real visitor address for rate limits |
 | 43 | Job import on GitHub Actions, import lock fixed for Neon, run every 3 hours |
 | 44 | Website live on Cloudflare, CORS and API address set |
-| 45 | Hosting and HTTPS added to the Privacy Policy |
-| 46 | CI: backend tests, undefined-name check, lint and build on every push |
+| 45 | Hosting and HTTPS added to the Privacy Policy | Done |
+| 46 | CI: tests, undefined-name check, lint and build on every push | Done |
 
 Email alerts (a planned Day 29) were dropped on purpose: people do not open them, and no email service means less personal data.
 
@@ -613,14 +613,16 @@ Free-tier facts that shape the design: the API sleeps after 15 idle minutes, has
 | 42 | API live on Render, real visitor address for rate limits | Done |
 | 43 | Importer on GitHub Actions (every 3 hours), lock fixed for Neon | Done |
 | 44 | Website live on Cloudflare, CORS and API address set | Done |
-| 45 | Hosting and HTTPS added to the Privacy Policy, full walkthrough of the live site | Verify |
-| 46 | CI: tests, undefined-name check, lint and build on every push | Verify |
-| 47 | Package the Chrome extension for the live site | Next |
-| 48 | Backups, keep-alive pings and uptime alerts | Planned |
-| 49 to 50 | Beta with 10 to 20 real users, fix the top issues | Planned |
-| 51 | Legal check of each job source's terms, attribution links | Planned |
-| 52 to 53 | Landing page and demo video | Planned |
-| 54 | Final review, update the resume to "deployed" | Planned |
+| 45 | Hosting and HTTPS added to the Privacy Policy | Done |
+| 46 | CI: tests, undefined-name check, lint and build on every push | Done |
+| 47 | Chrome extension works on the live site, download link | Done |
+| 48 | Daily encrypted database backup, Cloudflare cron keep-alive, failure alerts through GitHub | Done |
+| 49 | Beta opened to testers, daily monitoring routine | Done |
+| 50 | Read feedback and fix the top issues | In progress |
+| 51 | Job source terms checked, source links on third-party jobs, credits in the Terms | Done |
+| 52 | Landing page for visitors | Done |
+| 53 | Screenshots and demo video | In progress |
+| 54 | Final review, resume update, tag v1.0.0 | Next |
 
 ### Later ideas
 
