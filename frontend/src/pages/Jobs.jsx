@@ -320,7 +320,7 @@ export default function Jobs() {
             <div className="row between foot muted small">
               <span>Posted {timeAgo(job.created_at)}</span>
               <span>
-                {job.source === "native" ? `${job.applicant_count} applicants` : sourceBadge(job.source)}
+                {job.source === "native" ? `${job.applicant_count} applicants` : isThirdParty(job.source) && job.apply_url ? (<a className="link" href={job.apply_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{sourceBadge(job.source)}</a>) : sourceBadge(job.source)}
               </span>
             </div>
             <div className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</div>

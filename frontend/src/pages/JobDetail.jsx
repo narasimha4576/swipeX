@@ -8,6 +8,7 @@ import MatchCard from "./MatchCard";
 import {
   COMP_LABEL,
   isThirdParty,
+  SOURCE_LABEL,
   sourceBadge,
   JOB_TYPE_LABEL,
   LEVEL_LABEL,
@@ -199,7 +200,7 @@ export default function JobDetail({ jobId, embedded = false }) {
             <span className={`comp ${job.competition_level}`}>{COMP_LABEL[job.competition_level]}</span>
           </div>
 
-          {isThirdParty(job.source) && (<div className="warn-note" style={{ marginTop: "1rem" }}>Third-party listing. SwipeX has not checked this company or posting. Apply at your own risk.</div>)}
+          {isThirdParty(job.source) && (<div className="warn-note" style={{ marginTop: "1rem" }}>Third-party listing. SwipeX has not checked this company or posting. Apply at your own risk. Source: <a className="link" href={job.apply_url} target="_blank" rel="noopener noreferrer">{SOURCE_LABEL[job.source] ?? job.source}</a>.</div>)}
 
           <SafetyCard jobId={job.id} />
 

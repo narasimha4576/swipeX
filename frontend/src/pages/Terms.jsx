@@ -85,7 +85,17 @@ export default function Terms() {
         {LEGAL.country}.
       </p>
 
-      <h2>11. Contact</h2>
+      <h2>11. Job sources and credits</h2>
+      <p>
+        Job listings come from the public job boards of employers (through Greenhouse, Lever and Ashby) and from
+        <a className="link" href="https://remoteok.com" target="_blank" rel="noopener noreferrer"> Remote OK</a> and
+        <a className="link" href="https://www.arbeitnow.com" target="_blank" rel="noopener noreferrer"> Arbeitnow</a>.
+        Each third-party listing links to its source. Job postings, company names and logos belong to their owners,
+        and SwipeX is not affiliated with or endorsed by them. If you own a listing shown here and want it removed or
+        corrected, write to {LEGAL.contactEmail}.
+      </p>
+
+      <h2>12. Contact</h2>
       <p>{LEGAL.contactEmail}</p>
     </div>
   );

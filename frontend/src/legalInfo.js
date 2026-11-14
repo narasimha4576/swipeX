@@ -4,5 +4,5 @@ export const LEGAL = {
   operator: "Lakshmi Narasimha",
   contactEmail: "lakshminarasimha.contact@gmail.com",
   country: "India",
-  updated: "11 November 2026",
+  updated: "13 November 2026",
 };
