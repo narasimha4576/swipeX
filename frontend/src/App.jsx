@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-do
 import { AuthProvider } from "./auth";
 import { useAuth } from "./authContext";
 import AuthPage from "./pages/AuthPage";
+import Landing from "./pages/Landing";
 const Discover = lazyPage(() => import("./pages/Discover"));
 import Jobs from "./pages/Jobs";
 import Home from "./pages/Home";
@@ -243,6 +244,7 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<><AuthPage /><AuthLinks /><LegalFooter /></>} />
           <Route path="/u/:slug" element={<><PublicProfile /><LegalFooter /></>} />
           <Route path="/privacy" element={<PrivacyPolicy />} />

@@ -6,7 +6,7 @@ import ThemeToggle from "./ThemeToggle";
 
 export default function AuthPage() {
   const { user, login, register } = useAuth();
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState(new URLSearchParams(window.location.search).get("mode") === "register" ? "register" : "login");
   const [form, setForm] = useState({
     full_name: "",
     email: "",
