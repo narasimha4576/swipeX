@@ -1,0 +1,39 @@
+name: Publish Docker images
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ghcr.io/narasimha4576/swipex-backend:${{ github.ref_name }}
+            ghcr.io/narasimha4576/swipex-backend:latest
+          labels: org.opencontainers.image.source=https://github.com/narasimha4576/swipeX
+      - name: Website image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ghcr.io/narasimha4576/swipex-frontend:${{ github.ref_name }}
+            ghcr.io/narasimha4576/swipex-frontend:latest
+          labels: org.opencontainers.image.source=https://github.com/narasimha4576/swipeX
