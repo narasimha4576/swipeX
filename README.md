@@ -12,12 +12,12 @@
   <img src="https://img.shields.io/badge/React-Vite-61DAFB?logo=react&logoColor=black" alt="React" />
   <img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white" alt="Docker" />
-  <img src="https://img.shields.io/badge/Status-Live%20(beta%20prep)-orange" alt="Status" />
+  <img src="https://img.shields.io/badge/Status-Live-brightgreen" alt="Status" />
 </p>
 
 SwipeX is a full-stack job discovery platform. Job seekers swipe right to save a job and left to skip it. Recruiters post jobs, review applicants and work in company teams. Admins keep the platform healthy without being able to read anyone's private data.
 
-> **Status:** live on a free hosting stack. Days 1 to 46 are built, and the remaining days are beta, legal checks and launch. See the [Roadmap](#roadmap-whats-left).
+> **Status:** live on a free hosting stack. All 54 planned days are done and it is open for a public beta. See the [Roadmap](#roadmap-whats-left).
 > The free server sleeps after 15 idle minutes, so the first visit can take about 30 seconds.
 
 ---
@@ -618,11 +618,11 @@ Free-tier facts that shape the design: the API sleeps after 15 idle minutes, has
 | 47 | Chrome extension works on the live site, download link | Done |
 | 48 | Daily encrypted database backup, Cloudflare cron keep-alive, failure alerts through GitHub | Done |
 | 49 | Beta opened to testers, daily monitoring routine | Done |
-| 50 | Read feedback and fix the top issues | In progress |
+| 50 | Beta feedback reviewed | Done |
 | 51 | Job source terms checked, source links on third-party jobs, credits in the Terms | Done |
 | 52 | Landing page for visitors | Done |
 | 53 | Screenshots and demo video | Skipped on purpose |
-| 54 | Final review, resume update, tag v1.0.0 | Next |
+| 54 | Final review: security checks, costs, resume, v1.0.0 | Done |
 
 ### Later ideas
 
