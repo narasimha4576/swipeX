@@ -621,7 +621,7 @@ Free-tier facts that shape the design: the API sleeps after 15 idle minutes, has
 | 50 | Read feedback and fix the top issues | In progress |
 | 51 | Job source terms checked, source links on third-party jobs, credits in the Terms | Done |
 | 52 | Landing page for visitors | Done |
-| 53 | Screenshots and demo video | In progress |
+| 53 | Screenshots and demo video | Skipped on purpose |
 | 54 | Final review, resume update, tag v1.0.0 | Next |
 
 ### Later ideas
